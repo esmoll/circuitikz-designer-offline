@@ -243,6 +243,59 @@ export async function run(ctx) {
 		expectWire(wires[0], PX, 0, 2 * PX, 0, "wire spans only the coords around --")
 	}
 
+	// 12a. a node element between a coordinate and the op is walked through —
+	// pole nodes sit there all over the corpus; this used to drop the segment
+	// silently (review finding on card 041)
+	{
+		const bc = makeCtx()
+		const wires = handle(cmd("(0,0) node[ocirc]{} -- (1,0)"), bc)
+		ctx.assert(wires.length === 1, `node before --: expected exactly 1 wire, got ${wires.length}`)
+		expectWire(wires[0], 0, 0, PX, 0, "node before --: the segment is not lost")
+		ctx.assert(bc.report.length === 0, `node before --: no warning expected, got ${bc.report.length}`)
+	}
+	{
+		const bc = makeCtx()
+		const wires = handle(cmd("(0,0) -- node[above] {$x$} (1,0)"), bc)
+		ctx.assert(wires.length === 1, `node after --: expected exactly 1 wire, got ${wires.length}`)
+		expectWire(wires[0], 0, 0, PX, 0, "node after --: the label node is walked through")
+		ctx.assert(bc.report.length === 0, `node after --: no warning expected, got ${bc.report.length}`)
+	}
+	{
+		const bc = makeCtx()
+		const wires = handle(cmd("(0,0) node[circ]{} -- (1,0) node[circ]{} -- (2,0)"), bc)
+		ctx.assert(wires.length === 2, `pole chain: expected 2 wires, got ${wires.length}`)
+		expectWire(wires[0], 0, 0, PX, 0, "pole chain: first segment")
+		expectWire(wires[1], PX, 0, 2 * PX, 0, "pole chain: second segment")
+		ctx.assert(bc.report.length === 0, `pole chain: no warning expected, got ${bc.report.length}`)
+	}
+	{
+		const bc = makeCtx()
+		const wires = handle(cmd("(0,0) node[circ]{} node[above] {x} -- (1,0)"), bc)
+		ctx.assert(wires.length === 1, `several nodes before --: expected 1 wire, got ${wires.length}`)
+		expectWire(wires[0], 0, 0, PX, 0, "several nodes before --: walked through")
+	}
+	{
+		// walking stops at the next op or to: these stay silent per the card
+		const bc = makeCtx()
+		const wires = handle(cmd("(0,0) node[ocirc]{} -- to[L] (1,0)"), bc)
+		ctx.assert(wires.length === 0, `node then -- to[L]: expected 0 wires, got ${wires.length}`)
+		ctx.assert(bc.report.length === 0, `node then -- to[L]: no warning expected, got ${bc.report.length}`)
+	}
+	{
+		const bc = makeCtx()
+		const wires = handle(cmd("(0,0) node[ocirc]{} --"), bc)
+		ctx.assert(wires.length === 0, `node then trailing --: expected 0 wires, got ${wires.length}`)
+		ctx.assert(bc.report.length === 0, `node then trailing --: no warning expected, got ${bc.report.length}`)
+	}
+	{
+		// the unresolvable side still warns even when found through a node
+		const bc = makeCtx()
+		const wires = handle(cmd("(0,0) node[circ]{} -- (A)"), bc)
+		ctx.assert(wires.length === 0, `node then unknown (A): expected 0 wires, got ${wires.length}`)
+		ctx.assert(bc.report.length === 1, `node then unknown (A): expected 1 warning, got ${bc.report.length}`)
+		ctx.assert(bc.report[0].text === "(A)", `warning text ${JSON.stringify(bc.report[0].text)}, expected "(A)"`)
+	}
+
 	// 13. non-draw kinds are never dispatched (direct handle calls stay out of contract)
 	{
 		const gotNode = canHandle({ ...cmd("(0,0) -- (1,0)"), kind: "node" })

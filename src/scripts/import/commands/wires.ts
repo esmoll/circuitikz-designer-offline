@@ -77,24 +77,37 @@ export const wireHandler: CommandHandler = {
 		// when the coordinate is not adjacent to a `--` operator.
 		const points: Array<Point | null> = elements.map((el) => (el.kind === "coord" ? resolveCoord(el.text, ctx) : null))
 
+		// Index of the nearest coordinate on one side of an operator, or -1.
+		// Pole nodes sit between a coordinate and the operator all over the
+		// corpus (`(3.2,3.2) node[circ]{} -- (3.2,3.5)`), so `node` elements
+		// are walked through; an `op` or `to` ends the search — that segment
+		// belongs to another construct (`-- to[L] (x,y)` stays silent).
+		const nearestCoord = (from: number, step: number): number => {
+			for (let j = from; j >= 0 && j < elements.length; j += step) {
+				const el = elements[j]
+				if (el.kind === "coord") return j
+				if (el.kind === "op" || el.kind === "to") return -1
+			}
+			return -1
+		}
+
 		const wires: ComponentSaveObject[] = []
 		for (let i = 0; i < elements.length; i++) {
 			const op = elements[i]
 			if (op.kind !== "op" || !wireOperators.has(op.text)) continue
 
-			const before = elements[i - 1]
-			const after = elements[i + 1]
+			const before = nearestCoord(i - 1, -1)
+			const after = nearestCoord(i + 1, 1)
 			// No coordinate on either side — nothing to attach this operator to.
-			// (`-- to[L] (x,y)` is skipped silently; a trailing op has no pair.)
-			if (!before || before.kind !== "coord") continue
-			if (!after || after.kind !== "coord") continue
+			// (`-- to[L] (x,y)` and a trailing op stay silent, per the card.)
+			if (before === -1 || after === -1) continue
 
-			const start = points[i - 1]
-			const end = points[i + 1]
+			const start = points[before]
+			const end = points[after]
 			if (!start || !end) {
 				ctx.report.push({
 					line: cmd.line,
-					text: !start ? before.text : after.text,
+					text: !start ? elements[before].text : elements[after].text,
 					reason: "coordinate could not be resolved; wire skipped",
 				})
 				continue
