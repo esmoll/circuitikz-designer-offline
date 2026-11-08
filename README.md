@@ -90,6 +90,28 @@ All controls of the application are explained in the help menu in the top right 
 
 If you need help, please use the [general discussions](https://github.com/Circuit2TikZ/CircuiTikZ-Designer/discussions/categories/general) page.
 
+## Importing CircuiTikZ sources (.tex)
+
+The load dialog accepts `.tex`, `.tikz` and `.pgf` files (as well as the native
+`.json`). The importer handles hand-written CircuiTikZ drawings that use:
+
+- `\draw` with `--` and `to[...]` paths;
+- absolute `(x,y)`, relative `++(dx,dy)` and named `(A)` coordinates;
+- `calc` forms `$(A)+(dx,dy)$` and `$(A)!t!(B)$`;
+- sub-node anchors such as `(VT.G)`;
+- `\foreach` loops (expanded by textual substitution);
+- `\ctikzset`, `\definecolor` and `\usepackage[european,RPvoltages]{circuitikz}`.
+
+After loading, a summary is shown: `imported N, skipped M`. Skipped lines are
+listed in the developer console with their line numbers.
+
+Some constructs are covered only partially so far: the colour of a text node
+(`text=`), the position of some text nodes, and some sub-node anchors are
+skipped with a warning rather than guessed at.
+
+Not supported: plain-TikZ block diagrams (`positioning`, `block/.style`),
+`circuitikz` environment syntax, `rectangle`/`arc`/`|-` paths, `\pgfmathsetmacro`.
+
 ## Contributing
 
 ### Bug reporting
