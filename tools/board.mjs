@@ -43,8 +43,7 @@ const LABEL_COLORS = {
 // ---------------------------------------------------------------- utilities
 
 const die = (msg) => {
-	console.error(`board: ${msg}`)
-	process.exit(1)
+	throw new Error(msg)
 }
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
@@ -99,8 +98,14 @@ function credentialToken() {
 const TOKEN = process.env.GH_TOKEN || process.env.GITHUB_TOKEN || credentialToken()
 const REPO = process.env.BOARD_REPO || gitRemote()
 
-if (!TOKEN) die("no GitHub token (set GH_TOKEN or configure git credentials)")
-if (!REPO) die("cannot determine repository (set BOARD_REPO=owner/repo)")
+if (!TOKEN) {
+	console.error("board: no GitHub token (set GH_TOKEN or configure git credentials)")
+	process.exit(1)
+}
+if (!REPO) {
+	console.error("board: cannot determine repository (set BOARD_REPO=owner/repo)")
+	process.exit(1)
+}
 
 async function api(method, endpoint, body) {
 	for (let attempt = 0; attempt < 3; attempt++) {
@@ -561,32 +566,37 @@ async function cmdExport(target) {
 const { positional, flags } = parseArgs(process.argv.slice(2))
 const command = positional[0]
 
-switch (command) {
-	case "init":
-		await cmdInit()
-		break
-	case "status":
-		await cmdStatus(flags)
-		break
-	case "next":
-		await cmdNext(flags)
-		break
-	case "claim":
-		await cmdClaim(positional[1], flags.owner)
-		break
-	case "done":
-		await cmdDone(positional[1], flags.note)
-		break
-	case "block":
-		await cmdBlock(positional[1], flags.reason)
-		break
-	case "release":
-		await cmdRelease(positional[1])
-		break
-	case "export":
-		await cmdExport(positional[1])
-		break
-	default:
-		console.log(fs.readFileSync(fileURLToPath(import.meta.url), "utf8").split("*/")[0].split("/**")[1].trim())
-		process.exit(command ? 1 : 0)
+try {
+	switch (command) {
+		case "init":
+			await cmdInit()
+			break
+		case "status":
+			await cmdStatus(flags)
+			break
+		case "next":
+			await cmdNext(flags)
+			break
+		case "claim":
+			await cmdClaim(positional[1], flags.owner)
+			break
+		case "done":
+			await cmdDone(positional[1], flags.note)
+			break
+		case "block":
+			await cmdBlock(positional[1], flags.reason)
+			break
+		case "release":
+			await cmdRelease(positional[1])
+			break
+		case "export":
+			await cmdExport(positional[1])
+			break
+		default:
+			console.log(fs.readFileSync(fileURLToPath(import.meta.url), "utf8").split("*/")[0].split("/**")[1].trim())
+			process.exit(command ? 1 : 0)
+	}
+} catch (error) {
+	console.error(`board: ${error.message}`)
+	process.exit(1)
 }
