@@ -10,6 +10,8 @@ import {
 	GlobalTikzSettings,
 	EnvironmentVariableController,
 } from "../internal"
+import { texToSaveFile } from "../import"
+import { formatImportReport } from "../import/report"
 import { version } from "../../../package.json"
 
 // bump this if something is removed or adjusted in how the save file is formatted. (No change necessary if something is added)
@@ -20,6 +22,12 @@ export type SaveFileFormat = {
 	tikzSettings: GlobalTikzSettings
 	components: ComponentSaveObject[]
 }
+
+/** The importer's own bookkeeping, as returned by `texToSaveFile`. */
+type TexImportResult = ReturnType<typeof texToSaveFile>["result"]
+
+/** Extensions the CircuiTikZ importer takes (card `054`). */
+const texExtensions = [".tex", ".tikz", ".pgf"]
 
 export let emtpySaveState: SaveFileFormat = {
 	version: currentSaveVersion,
@@ -108,7 +116,28 @@ export class SaveController {
 				reader.readAsText(file, "UTF-8")
 				reader.onload = (evt) => {
 					let inputstring = evt.target.result instanceof ArrayBuffer ? "" : evt.target.result
-					const input = JSON.parse(inputstring)
+
+					// a CircuiTikZ source goes through the importer, then the same JSON path
+					const isTex = texExtensions.some((extension) => file.name.toLowerCase().endsWith(extension))
+					if (isTex) {
+						const { saveFile, result } = texToSaveFile(inputstring, file.name)
+						this.loadFromJSON(saveFile, true)
+						this.showImportReport(result)
+						this.loadModal.hide()
+						return
+					}
+
+					let input: SaveFileFormat
+					try {
+						input = JSON.parse(inputstring)
+					} catch {
+						this.loadMessage.textContent = "error: not a JSON save file"
+						return
+					}
+					if (!input || typeof input !== "object") {
+						this.loadMessage.textContent = "error: not a JSON save file"
+						return
+					}
 					if (!("version" in input)) {
 						alert(
 							"You are using an old version of the json save file format. Please override all files exported from Circuitikz Designer version 0.6 and older by reexporting your circuit to json to update them to the newest json save file format version (currently: " +
@@ -142,6 +171,23 @@ export class SaveController {
 			passive: true,
 			once: true,
 		})
+	}
+
+	/**
+	 * Shows the importer's summary in the load modal and prints the skipped
+	 * lines to the console.
+	 *
+	 * The modal is closing at this point, so the message is what the user reads
+	 * right before it disappears; the console keeps the details.
+	 *
+	 * @param result - the importer's result, from `texToSaveFile`
+	 */
+	private showImportReport(result: TexImportResult) {
+		const { summary, details } = formatImportReport(result)
+		this.loadMessage.textContent = details.length
+			? `${summary} — ${details.length} skipped line(s) shown in the console`
+			: summary
+		if (details.length) console.warn("[tex import] skipped lines:\n" + details.join("\n"))
 	}
 
 	loadFromJSON(saveFile: SaveFileFormat, selectComponents = false) {
