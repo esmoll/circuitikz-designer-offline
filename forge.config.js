@@ -8,6 +8,12 @@ module.exports = {
     "icon": "./src/icons/android-icon-192x192.ico",
     "out": "./build/",
     "asar": true,
+    "ignore": (file) => {
+      // Skip redundant source copies (bundled versions live in dist/)
+      if (/^\/src\/vendor\//.test(file)) return true
+      if (/^\/src\/styles\/material-symbols-outlined\.woff2$/.test(file)) return true
+      return false
+    },
   },
   rebuildConfig: {},
   makers: [
@@ -18,20 +24,6 @@ module.exports = {
     {
       name: '@electron-forge/maker-zip',
       // platforms: ['darwin'],
-    },
-    {
-      name: '@electron-forge/maker-deb',
-      config: {},
-    },
-    {
-      name: '@electron-forge/maker-rpm',
-      config: {},
-    },
-    {
-      name: '@electron-forge/maker-wix',
-      config: {
-        "icon": "./src/icons/android-icon-192x192.ico",
-      },
     },
   ],
   plugins: [

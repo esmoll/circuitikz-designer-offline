@@ -1,5 +1,29 @@
-// $material-symbols-font-path: "../../node_modules/material-symbols/";
-// @import "material-symbols/outlined";
+// Self-hosted Material Symbols icon font (offline)
+@font-face {
+	font-family: "Material Symbols Outlined";
+	font-style: normal;
+	font-weight: 100 700;
+	font-display: block;
+	src: url("./material-symbols-outlined.woff2") format("woff2");
+}
+.material-symbols-outlined {
+	font-family: "Material Symbols Outlined";
+	font-weight: normal;
+	font-style: normal;
+	font-size: 24px;
+	line-height: 1;
+	letter-spacing: normal;
+	text-transform: none;
+	display: inline-block;
+	white-space: nowrap;
+	word-wrap: normal;
+	direction: ltr;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	text-rendering: optimizeLegibility;
+	font-feature-settings: "liga";
+	font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+}
 // TODO clean up all css
 
 // Bootstrap
@@ -11,7 +35,8 @@ $primary-bg-subtle: #d3dde6;
 //$success: #7BB725;
 $danger: #c50f3c;
 
-@import url("https://cdn.jsdelivr.net/gh/vsalvino/computer-modern@main/fonts/serif.css");
+// Self-hosted Computer Modern Serif fonts (offline)
+@import url("../vendor/fonts/computer-modern-serif.css");
 
 @import "dropdown_variables.scss";
 // import bootstrap:

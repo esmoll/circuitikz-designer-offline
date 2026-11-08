@@ -7,6 +7,43 @@
 
 An interactive, visual, online editor for creating electrical circuit diagrams for LaTeX/CircuiTi*k*Z with ease. Try it out [online](https://circuit2tikz.tf.fau.de/designer/)!
 
+> [!NOTE]
+> **This is a fork of [Circuit2TikZ/CircuiTikZ-Designer](https://github.com/Circuit2TikZ/CircuiTikZ-Designer).**
+> It is not affiliated with the upstream project or with FAU Erlangen-Nürnberg.
+> The official, maintained web version lives at <https://circuit2tikz.tf.fau.de/designer/> — use it unless you specifically need the offline/desktop build from here.
+
+## Download
+
+Prebuilt Windows binaries for this fork are attached to the [releases](../../releases) page:
+
+| Asset | Description |
+| --- | --- |
+| `circutikz-pwa-<version> Setup.exe` | Installer (Squirrel). Installs per-user into `%LOCALAPPDATA%`, no administrator rights needed. |
+| `circutikz-pwa-win32-x64-<version>.zip` | Portable. Unpack anywhere and run `circutikz-pwa.exe`. |
+| `SHA256SUMS.txt` | Checksums. The binaries are **not code-signed**, so verify them before running. |
+
+> [!WARNING]
+> The executables are unsigned. Windows SmartScreen will warn you on first launch
+> ("Windows protected your PC" → *More info* → *Run anyway*). If that is not acceptable,
+> build from source — see [Use locally](#use-locally).
+
+Note that only the *application* is portable: user settings and saved diagrams are stored in
+`%APPDATA%\circutikz-designer`.
+
+## Changes in this fork
+
+- **Offline assets.** MathJax (`tex-svg`) and the Computer Modern / Material Symbols fonts are
+  vendored under `src/vendor/` instead of being fetched from a CDN, so the editor works with no
+  internet access. All other use of remote resources is gone.
+- **Electron packaging.** `electron-forge` builds a Windows installer and a portable ZIP;
+  `src/scripts/main.js` is the Electron main process and loads `dist/index.html`.
+- **Repository housekeeping.** `CHANGELOG.md` and `CLA.md` from upstream are not carried over,
+  and the upstream `npm-publish.yml` workflow (which cannot work here — the package is private and
+  has no `test` script) is replaced by a release workflow.
+
+Everything else is the upstream code base, unmodified. Third-party components and their licenses
+are listed in [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
+
 ## Overview
 
 CircuiTi*k*Z-Designer bridges the gap between visual circuit design and precise LaTeX code, letting you design, customize, and export diagrams without manually writing TikZ commands.

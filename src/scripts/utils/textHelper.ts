@@ -32,9 +32,9 @@ export let textToSVG: TextToSVG
 export function loadTextConverter() {
 	return new Promise<void>((resolve) => {
 		TextToSVG.load(
-			"https://cdn.jsdelivr.net/gh/dreampulse/computer-modern-web-font@master/font/Serif/cmunrm.woff",
+			new URL("../../vendor/fonts/cmunrm.woff", import.meta.url).href,
 			(err, tTSVG) => {
-				textToSVG = tTSVG
+				if (!err) textToSVG = tTSVG
 				resolve()
 			}
 		)

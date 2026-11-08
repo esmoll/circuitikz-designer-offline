@@ -136,7 +136,10 @@ export class MainController {
 		let mathJaxPromise = this.loadMathJax()
 		let canvasPromise = this.initCanvas()
 		let symbolsDBPromise = this.initSymbolDB()
-		let fontPromise = Promise.all([document.fonts.load("1em Computer Modern Serif"), loadTextConverter()])
+		let fontPromise = Promise.all([
+			document.fonts.load("1em Computer Modern Serif").catch(() => {}),
+			loadTextConverter(),
+		])
 
 		MainController.appVersion = version
 		document.addEventListener("DOMContentLoaded", () => {
@@ -275,16 +278,18 @@ export class MainController {
 				}
 			}
 			var script = document.createElement("script")
-			script.src = "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"
+			script.src = new URL("../../vendor/mathjax/tex-svg.js", import.meta.url).href
 			document.head.appendChild(script)
 
-			script.addEventListener(
-				"load",
-				function () {
+			var done = false
+			var finish = () => {
+				if (!done) {
+					done = true
 					resolve("")
-				},
-				false
-			)
+				}
+			}
+			script.addEventListener("load", finish, false)
+			script.addEventListener("error", finish, false)
 		})
 		return promise
 	}
