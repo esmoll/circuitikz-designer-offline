@@ -18,9 +18,12 @@ Prebuilt Windows binaries for this fork are attached to the [releases](../../rel
 
 | Asset | Description |
 | --- | --- |
-| `circutikz-pwa-<version> Setup.exe` | Installer (Squirrel). Installs per-user into `%LOCALAPPDATA%`, no administrator rights needed. |
+| `circutikz-pwa-<version>.Setup.exe` | Installer (Squirrel). Installs per-user into `%LOCALAPPDATA%`, no administrator rights needed. |
 | `circutikz-pwa-win32-x64-<version>.zip` | Portable. Unpack anywhere and run `circutikz-pwa.exe`. |
 | `SHA256SUMS.txt` | Checksums. The binaries are **not code-signed**, so verify them before running. |
+
+The installer is built with a space in its name (`circutikz-pwa-<version> Setup.exe`); GitHub
+replaces that space with a dot, so the downloaded asset is `circutikz-pwa-<version>.Setup.exe`.
 
 > [!WARNING]
 > The executables are unsigned. Windows SmartScreen will warn you on first launch
