@@ -1,0 +1,52 @@
+% Sepic-преобразователь.
+% Два дросселя L1, L2, связующий конденсатор C1, ключ VT (MOSFET с
+% индуцированным каналом), диод VD, выходной C и R_н.
+% U_вых = U_вх·D/(1-D), полярность выходного напряжения положительная.
+\documentclass[border=4pt]{standalone}
+\usepackage{amsmath}
+\usepackage{fontspec}
+\setmainfont{Calibri}
+\usepackage[european, RPvoltages]{circuitikz}
+\usetikzlibrary{arrows.meta, calc}
+\definecolor{ink}{RGB}{31,42,51}
+\definecolor{grp}{RGB}{46,110,140}
+\ctikzset{bipoles/length=1.0cm}
+\ctikzset{bipoles/thickness=0.9}
+\ctikzset{diodes/fill=ink}
+\ctikzset{inductor=american}
+
+\begin{document}
+\begin{tikzpicture}[line width=1.0pt, color=ink, font=\small]
+  % --- входные зажимы (открытые)
+  \draw (0.6,3.6) node[ocirc]{} node[above left]{$+$} -- (1.1,3.6);
+  \node[anchor=east] at (0.4,1.8) {$U_{\text{вх}}$};
+  % --- L1 в шине входа
+  \draw (1.1,3.6) to[L, l_=$L_1$] (2.5,3.6) -- (3.1,3.6)
+        node[circ]{};
+  % --- ключ VT: земля -> узел A (путь снизу вверх, затвор влево)
+  \draw (3.1,0) node[circ]{} to[Tnigfete, name=VT] (3.1,2.8)
+        -- (3.1,3.6);
+  \node[anchor=west] at (3.6,2.0) {VT};
+  \draw[grp] (VT.G) -- ++(-0.5,0);
+  \node[anchor=east, text=grp] at ($(VT.G)+(-0.55,0)$) {ШИМ};
+  % --- связующий конденсатор C1 (горизонтально)
+  \draw (3.1,3.6) -- (3.5,3.6) to[C, l_=$C_1$] (4.7,3.6) -- (5.1,3.6)
+        node[circ]{};
+  % --- L2: узел B -> земля
+  \draw (5.1,3.6) -- (5.1,2.6) to[L, l=$L_2$] (5.1,1.2) -- (5.1,0)
+        node[circ]{};
+  % --- диод VD: анод в B, катод на выход
+  \draw (5.1,3.6) -- (5.5,3.6) to[D, name=VD] (6.3,3.6) -- (8.2,3.6);
+  \node[anchor=south] at (5.9,3.72) {VD};
+  % --- нижняя шина
+  \draw (0.6,0) node[ocirc]{} node[below left]{$-$} -- (8.2,0);
+  % --- выходной конденсатор и нагрузка
+  \draw (7.0,3.6) node[circ]{} to[C, l_=$C$] (7.0,0) node[circ]{};
+  \draw (7.9,3.6) node[circ]{} to[R, l_=$R_{\text{н}}$] (7.9,0)
+        node[circ]{};
+  % --- выходные зажимы
+  \draw (8.2,3.6) node[ocirc]{} node[above right]{$+$};
+  \draw (8.2,0) node[ocirc]{} node[below right]{$-$};
+  \node[anchor=west] at (8.4,1.8) {$U_{\text{вых}}$};
+\end{tikzpicture}
+\end{document}

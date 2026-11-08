@@ -1,0 +1,51 @@
+% Косой мост (полумост).
+% Делитель C1-C2 создаёт среднюю точку; два ключа VT1/VT2 (MOSFET с
+% индуцированным каналом) поочерёдно подключают первичную обмотку к
+% половинам входного напряжения. Вторичная цепь — к ВЧ-выпрямителю.
+\documentclass[border=4pt]{standalone}
+\usepackage{amsmath}
+\usepackage{fontspec}
+\setmainfont{Calibri}
+\usepackage[european, RPvoltages]{circuitikz}
+\usetikzlibrary{arrows.meta, calc}
+\definecolor{ink}{RGB}{31,42,51}
+\definecolor{grp}{RGB}{46,110,140}
+\ctikzset{bipoles/length=1.0cm}
+\ctikzset{bipoles/thickness=0.9}
+\ctikzset{diodes/fill=ink}
+\ctikzset{inductor=american}
+
+\begin{document}
+\begin{tikzpicture}[line width=1.0pt, color=ink, font=\small]
+  % --- входные зажимы (открытые)
+  \draw (0.6,4.0) node[ocirc]{} node[above left]{$+$} -- (4.3,4.0);
+  \node[anchor=east] at (0.4,2.0) {$U_{\text{вх}}$};
+  % --- делитель C1-C2, средняя точка M
+  \draw (1.5,4.0) node[circ]{} to[C, l=$C_1$] (1.5,2.2) node[circ]{}
+        to[C, l=$C_2$] (1.5,0) node[circ]{};
+  % --- первичная обмотка: от средней точки делителя к узлу A
+  \draw (1.5,2.2) -- (2.3,2.2) to[L, l_=$w_1$] (3.7,2.2) -- (4.3,2.2)
+        node[circ]{};
+  % --- ключи VT1/VT2 (пути снизу вверх, затворы влево)
+  \draw (4.3,2.2) node[circ]{} to[Tnigfete, name=VT1] (4.3,3.2)
+        -- (4.3,4.0);
+  \draw (4.3,0) node[circ]{} to[Tnigfete, name=VT2] (4.3,1.4)
+        -- (4.3,2.2);
+  \node[anchor=west] at (4.75,2.8) {VT1};
+  \node[anchor=west] at (4.75,0.9) {VT2};
+  % --- затворы: ШИМ (влево)
+  \draw[grp] (VT1.G) -- ++(-0.5,0);
+  \node[anchor=east, text=grp] at ($(VT1.G)+(-0.55,0)$) {ШИМ};
+  \draw[grp] (VT2.G) -- ++(-0.5,0);
+  \node[anchor=east, text=grp] at ($(VT2.G)+(-0.55,0)$) {ШИМ};
+  % --- нижняя шина
+  \draw (0.6,0) node[ocirc]{} node[below left]{$-$} -- (4.3,0);
+  % --- магнитопровод (две горизонтальные линии между обмотками)
+  \draw[line width=0.8pt] (2.45,1.72) -- (3.45,1.72);
+  \draw[line width=0.8pt] (2.45,1.60) -- (3.45,1.60);
+  \draw (2.3,1.2) to[L, l_=$w_2$] (3.7,1.2);
+  % --- выводы вторички — к ВЧ-выпрямителю (развязка)
+  \draw[-{Stealth}, thin, grp] (3.9,1.2) -- (4.9,1.2);
+  \node[anchor=west, text=grp] at (5.0,1.2) {к ВЧ-выпрямителю};
+\end{tikzpicture}
+\end{document}

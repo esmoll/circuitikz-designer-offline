@@ -1,0 +1,51 @@
+% Однофазный мост VS1-VS4 (полностью управляемый) с обратным диодом VD0
+\documentclass[border=4pt]{standalone}
+\usepackage{amsmath}
+\usepackage{fontspec}
+\setmainfont{Calibri}
+\usepackage[european, RPvoltages]{circuitikz}
+\definecolor{ink}{RGB}{31,42,51}
+\definecolor{grp}{RGB}{46,110,140}
+\ctikzset{bipoles/length=1.0cm}
+\ctikzset{bipoles/thickness=0.9}
+\ctikzset{diodes/fill=ink}
+\ctikzset{inductor=american}
+
+\begin{document}
+\begin{tikzpicture}[line width=1.0pt, color=ink, font=\small]
+  % --- вторичная обмотка (a сверху, b снизу)
+  \draw (0,3.4) to[L] (0,2.2);
+  % --- выводы обмотки к средним точкам ног моста
+  \draw (0,3.4) -- (2.6,3.4) node[circ]{};      % a — середина левой ноги
+  \draw (0,2.2) -- (4.6,2.2);                    % b — к середине правой ноги (перекрёсток без точки на левой ноге)
+  % --- левая нога: VS1 (вверх к +), VS3 (вниз к -) — прямоугольник
+  \draw (2.6,0.4) -- (2.6,0.9) to[Ty, name=VS3] (2.6,1.7) -- (2.6,3.4) node[circ]{}
+        -- (2.6,3.9) to[Ty, name=VS1] (2.6,4.7) -- (2.6,5.2);
+  % --- правая нога: VS2 (вверх), VS4 (вниз); отпайка b на 2.2 (T-узел)
+  \draw (4.6,0.4) node[circ]{} -- (4.6,0.9) to[Ty, name=VS4] (4.6,1.7) -- (4.6,2.2)
+        node[circ]{} -- (4.6,3.9) to[Ty, name=VS2] (4.6,4.7) -- (4.6,5.2) node[circ]{};
+  % --- шины + и -
+  \draw (2.6,5.2) -- (7.6,5.2);
+  \draw (2.6,0.4) -- (7.6,0.4);
+  % --- обратный диод VD0 (катод к шине +) и нагрузка
+  \draw (6.4,5.2) node[circ]{} -- (6.4,3.9);
+  \draw (6.4,3.1) to[D] (6.4,3.9);
+  \draw (6.4,3.1) -- (6.4,0.4) node[circ]{};
+  \draw (7.6,5.2) -- (7.6,3.8) to[R] (7.6,1.8) -- (7.6,0.4);
+  % --- подписи
+  \node[anchor=south west] at (0.08,3.42) {$a$};
+  \node[anchor=north west] at (0.08,2.16) {$b$};
+  \node[anchor=west] at (2.95,4.3) {VS1};
+  \node[anchor=west] at (4.95,4.3) {VS2};
+  \node[anchor=east] at (2.25,2.8) {VS3};
+  \node[anchor=west] at (4.95,1.8) {VS4};
+  \node[anchor=east] at (6.0,3.5) {VD0};
+  \node[anchor=east] at (7.15,2.8) {$u_d$};
+  \node[anchor=west] at (8.05,2.7) {$R_{\text{н}}$};
+  \node[anchor=south west] at (7.55,5.22) {$+$};
+  \node[anchor=north west] at (7.55,0.38) {$-$};
+  % --- пары управления
+  \node[anchor=south, text=grp, font=\footnotesize] at (3.6,5.55)
+       {пары: (VS1,VS4) и (VS2,VS3) — импульсы с углом $\alpha$};
+\end{tikzpicture}
+\end{document}

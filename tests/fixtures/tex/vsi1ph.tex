@@ -1,0 +1,67 @@
+% Однофазный мостовой АИН: U_d + C_d, мост VT1-VT4 (MOSFET с
+% изолированным затвором и индуцированным каналом) с обратными
+% диодами VD1-VD4; выводы a, b; нагрузка R_н–L_н
+\documentclass[border=4pt]{standalone}
+\usepackage{amsmath}
+\usepackage{fontspec}
+\setmainfont{Calibri}
+\usepackage[european, RPvoltages]{circuitikz}
+\definecolor{ink}{RGB}{31,42,51}
+\definecolor{grp}{RGB}{46,110,140}
+\ctikzset{bipoles/length=1.0cm}
+\ctikzset{bipoles/thickness=0.9}
+\ctikzset{diodes/fill=ink}
+\ctikzset{inductor=american}
+
+\begin{document}
+\begin{tikzpicture}[line width=1.0pt, color=ink, font=\small]
+  % --- источник U_d (по центру между шинами) и конденсатор звена C_d
+  \draw (0,1.0) to[V, l=$U_{\text{d}}$] (0,3.0);
+  \draw (0,3.0) -- (0,4.8);
+  \draw (0,1.0) -- (0,-0.8);
+  \node[anchor=east] at (-0.15,3.05) {$+$};
+  \node[anchor=east] at (-0.15,0.95) {$-$};
+  \draw (0.9,-0.8) node[circ]{} to[C, l_=$C_{\text{d}}$] (0.9,4.8) node[circ]{};
+  % --- шины DC (непрерывные)
+  \draw (0,-0.8) -- (5.6,-0.8);
+  \draw (0,4.8) -- (5.6,4.8);
+  \node[anchor=south] at (1.6,4.86) {$+$};
+  \node[anchor=north] at (1.6,-0.86) {$-$};
+  % --- мост: ключи 3.5..4.3 (верх) и -0.3..0.5 (низ), отводы на 2.2;
+  %     обратные диоды правее на 0.7, оба остриём вверх
+  \foreach \xc/\xoff in {3.0/3.7, 4.9/5.6}{
+    \draw (\xc,2.2) node[circ]{} -- (\xc,3.5) to[Tnigfete] (\xc,4.3)
+          -- (\xc,4.8) node[circ]{};
+    \draw (\xc,-0.8) node[circ]{} -- (\xc,-0.3) to[Tnigfete] (\xc,0.5)
+          -- (\xc,2.2) node[circ]{};
+    \draw (\xc,-0.8) node[circ]{} -- (\xoff,-0.8) -- (\xoff,-0.3)
+          to[D] (\xoff,0.5) -- (\xoff,2.2) node[circ]{} -- (\xoff,3.5)
+          to[D] (\xoff,4.3) -- (\xoff,4.8) node[circ]{} -- (\xc,4.8) node[circ]{};
+  }
+  % --- перемычка отвода левой ноги к её диодной колонке
+  \draw (3.0,2.2) -- (3.7,2.2);
+  % --- выводы a, b
+  \draw (3.0,2.2) -- (2.2,2.2);
+  \draw (4.9,2.2) -- (5.9,2.2);
+  \node[draw, circle, inner sep=1.5pt, line width=0.9pt] at (2.2,2.2) {};
+  \node[draw, circle, inner sep=1.5pt, line width=0.9pt] at (5.9,2.2) {};
+  \node[anchor=south, font=\small] at (2.2,2.38) {a};
+  \node[anchor=south, font=\small] at (5.9,2.38) {b};
+  % --- нагрузка R_н–L_н (зажимы разнесены с элементами)
+  \draw (7.4,2.7) node[draw, circle, inner sep=1.5pt, line width=0.9pt]{}
+        node[anchor=south, font=\small]{a}
+        -- (7.4,2.1) to[R, l=$R_{\text{н}}$] (7.4,1.1) to[L, l=$L_{\text{н}}$] (7.4,0.1)
+        -- (7.4,-0.5) node[draw, circle, inner sep=1.5pt, line width=0.9pt]{}
+        node[anchor=north, font=\small]{b};
+  % --- подписи ключей (слева от затворов своего прибора)
+  \node[anchor=east, font=\footnotesize] at (2.58,3.9)  {VT1};
+  \node[anchor=east, font=\footnotesize] at (4.48,3.9)  {VT2};
+  \node[anchor=east, font=\footnotesize] at (2.58,0.1)  {VT4};
+  \node[anchor=east, font=\footnotesize] at (4.48,0.1)  {VT3};
+  \node[anchor=south, text=grp, font=\footnotesize] at (4.2,4.95)
+       {VD1--VD4 — обратные диоды};
+  \node[anchor=south, text=grp, font=\footnotesize, align=left] at (2.0,5.6)
+       {после переключения ток $L_{\text{н}}$ замыкается через обратные\\
+        диоды в $C_{\text{d}}$ — энергия возвращается в звено};
+\end{tikzpicture}
+\end{document}

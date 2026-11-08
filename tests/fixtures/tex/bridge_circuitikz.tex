@@ -1,0 +1,55 @@
+% Трёхфазная мостовая схема (Ларионова) — CircuitTikZ, ГОСТ-подобные символы
+% Обмотки — три одинаковые вертикальные ветви; точки-узлы только в T-соединениях
+\documentclass[border=4pt]{standalone}
+\usepackage{amsmath}
+\usepackage{fontspec}
+\setmainfont{Calibri}
+\usepackage[european, RPvoltages]{circuitikz}
+\definecolor{ink}{RGB}{31,42,51}
+\definecolor{grp}{RGB}{46,110,140}
+\ctikzset{bipoles/length=1.0cm}
+\ctikzset{bipoles/thickness=0.9}
+\ctikzset{diodes/fill=ink}      % залитые диоды (ГОСТ)
+\ctikzset{inductor=american}    % витки-полуокружности
+
+\begin{document}
+\begin{tikzpicture}[line width=1.0pt, color=ink, font=\small]
+  % --- три одинаковые вертикальные ветви: обмотки a, b, c (дуги влево)
+  \foreach \x/\ph in {0/a, 2.2/b, 4.4/c} {
+    \draw (\x,-1.8) to[L] (\x,0.6);
+    \node[anchor=west] at (\x+0.15,-0.6) {$\ph$};
+  }
+  % --- нулевая шина вторичной стороны (углы a и c — без точки)
+  \draw (0,-1.8) -- (4.4,-1.8);
+  \node[circ] at (2.2,-1.8) {};
+  % --- фазные линии к мосту: подъём на высоту отпайки своей ноги
+  \draw (0,0.6)   -- (0,3.2)   -- (7.2,3.2);
+  \draw (2.2,0.6) -- (2.2,2.2) -- (8.6,2.2);
+  \draw (4.4,0.6) -- (4.4,1.2) -- (10.0,1.2);
+  % --- столбцы моста: катодная группа вверху, анодная внизу (все остриём вверх)
+  \foreach \xc/\ynode in {7.2/3.2, 8.6/2.2, 10.0/1.2}{
+    \draw (\xc,\ynode) -- (\xc,3.7) to[D] (\xc,4.3) -- (\xc,4.6);
+    \draw (\xc,-0.6)  -- (\xc,-0.1) to[D] (\xc,0.5) -- (\xc,\ynode);
+    \node[circ] at (\xc,4.6) {};
+    \node[circ] at (\xc,-0.6) {};
+    \node[circ] at (\xc,\ynode) {};
+  }
+  % --- шины + и -, нагрузка (углы левой ноги — без точек)
+  \draw (7.2,4.6)  -- (11.6,4.6);
+  \draw (7.2,-0.6) -- (11.6,-0.6);
+  \draw (11.6,4.6) -- (11.6,3.0) to[R] (11.6,1.0) -- (11.6,-0.6);
+  % --- подписи
+  \node[anchor=west] at (7.55,4.0)  {VD1};
+  \node[anchor=west] at (8.95,4.0)  {VD2};
+  \node[anchor=west] at (10.35,4.0) {VD3};
+  \node[anchor=west] at (7.55,0.2)  {VD4};
+  \node[anchor=west] at (8.95,0.2)  {VD5};
+  \node[anchor=west] at (10.35,0.2) {VD6};
+  \node[anchor=south, text=grp] at (8.6,5.0)  {катодная группа (VD1--VD3)};
+  \node[anchor=north, text=grp] at (8.6,-1.2) {анодная группа (VD4--VD6)};
+  \node[anchor=east] at (11.15,2.0) {$u_d$};
+  \node[anchor=west] at (12.05,2.0) {$R_{\text{н}}$};
+  \node[anchor=south west] at (11.55,4.62) {$+$};
+  \node[anchor=north west] at (11.55,-0.62) {$-$};
+\end{tikzpicture}
+\end{document}

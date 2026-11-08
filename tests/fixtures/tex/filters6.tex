@@ -1,0 +1,85 @@
+% Шесть базовых схем сглаживающих фильтров (по УГАТУ рис. 15.5):
+% (а) C; (б) L; (в) Г-LC; (г) Г-RC; (д) П-CLC; (е) П-CRC — сетка 3x2
+\documentclass[border=4pt]{standalone}
+\usepackage{amsmath}
+\usepackage{fontspec}
+\setmainfont{Calibri}
+\usepackage[european, RPvoltages]{circuitikz}
+\definecolor{ink}{RGB}{31,42,51}
+\definecolor{grp}{RGB}{46,110,140}
+\ctikzset{bipoles/length=0.85cm}
+\ctikzset{bipoles/thickness=0.9}
+\ctikzset{diodes/fill=ink}
+\ctikzset{inductor=american}
+
+% вход выпрямителя: два зажима слева; нагрузка справа (вертикальный R)
+\newcommand{\srcpins}[2]{%
+  \draw (#1,#2) node[anchor=east, font=\footnotesize] {вход};%
+  \draw (#1,#2+0.55) -- (#1+0.5,#2+0.55);%
+  \draw (#1,#2-0.55) -- (#1+0.5,#2-0.55);%
+}
+\newcommand{\loadR}[2]{%
+  \draw (#1,#2+0.8) to[R, l_=$R_{\text{н}}$] (#1,#2-0.8);%
+}
+
+\begin{document}
+\begin{tikzpicture}[line width=0.9pt, color=ink, font=\small]
+  % ================= (а) C-фильтр =================
+  \begin{scope}[shift={(0,0)}]
+    \node[anchor=south, text=grp, font=\footnotesize] at (2.2,1.9) {а) ёмкостный};
+    \draw (0.6,0.8) -- (2.0,0.8) node[circ]{};          % верхняя шина
+    \draw (0.6,-0.8) -- (2.0,-0.8) node[circ]{};        % нижняя шина
+    \draw (2.0,0.8) to[C, l=$C_{\text{ф}}$] (2.0,-0.8);
+    \loadR{3.6}{0}
+    \draw (2.0,0.8) -- (3.6,0.8);
+    \draw (2.0,-0.8) -- (3.6,-0.8);
+  \end{scope}
+  % ================= (б) L-фильтр =================
+  \begin{scope}[shift={(6.0,0)}]
+    \node[anchor=south, text=grp, font=\footnotesize] at (2.2,1.9) {б) индуктивный};
+    \draw (0.6,0.8) -- (1.4,0.8) to[L, l=$L_{\text{ф}}$] (3.6,0.8);
+    \draw (0.6,-0.8) -- (3.6,-0.8);
+    \loadR{3.6}{0}
+  \end{scope}
+  % ================= (в) Г-LC =================
+  \begin{scope}[shift={(12.0,0)}]
+    \node[anchor=south, text=grp, font=\footnotesize] at (2.4,1.9) {в) Г-образный LC};
+    \draw (0.6,0.8) -- (1.2,0.8) to[L, l=$L_{\text{ф}}$] (2.6,0.8) node[circ]{}
+          -- (3.6,0.8);
+    \draw (0.6,-0.8) -- (3.6,-0.8) node[circ]{};
+    \draw (2.6,0.8) to[C, l_=$C_{\text{ф}}$] (2.6,-0.8);
+    \loadR{3.6}{0}
+  \end{scope}
+  % ================= (г) Г-RC =================
+  \begin{scope}[shift={(0,-3.4)}]
+    \node[anchor=north, text=grp, font=\footnotesize] at (2.4,-1.35) {г) Г-образный RC};
+    \draw (0.6,0.8) -- (1.2,0.8) to[R, l=$R_{\text{ф}}$] (2.6,0.8) node[circ]{}
+          -- (3.6,0.8);
+    \draw (0.6,-0.8) -- (3.6,-0.8) node[circ]{};
+    \draw (2.6,0.8) to[C, l_=$C_{\text{ф}}$] (2.6,-0.8);
+    \loadR{3.6}{0}
+  \end{scope}
+  % ================= (д) П-CLC =================
+  \begin{scope}[shift={(6.0,-3.4)}]
+    \node[anchor=north, text=grp, font=\footnotesize] at (3.0,-1.35) {д) П-образный CLC};
+    \draw (0.6,0.8) -- (1.2,0.8) node[circ]{} -- (1.8,0.8);
+    \draw (0.6,-0.8) -- (1.2,-0.8) node[circ]{} -- (3.6,-0.8) node[circ]{}
+          -- (5.4,-0.8);
+    \draw (1.2,0.8) to[C, l_=$C_{\text{ф1}}$] (1.2,-0.8);
+    \draw (1.8,0.8) to[L, l=$L_{\text{ф}}$] (3.6,0.8) node[circ]{} -- (5.4,0.8);
+    \draw (3.6,0.8) to[C, l_=$C_{\text{ф2}}$] (3.6,-0.8);
+    \loadR{5.4}{0}
+  \end{scope}
+  % ================= (е) П-CRC =================
+  \begin{scope}[shift={(12.0,-3.4)}]
+    \node[anchor=north, text=grp, font=\footnotesize] at (3.0,-1.35) {е) П-образный CRC};
+    \draw (0.6,0.8) -- (1.2,0.8) node[circ]{} -- (1.8,0.8);
+    \draw (0.6,-0.8) -- (1.2,-0.8) node[circ]{} -- (3.6,-0.8) node[circ]{}
+          -- (5.4,-0.8);
+    \draw (1.2,0.8) to[C, l_=$C_{\text{ф1}}$] (1.2,-0.8);
+    \draw (1.8,0.8) to[R, l=$R_{\text{ф}}$] (3.6,0.8) node[circ]{} -- (5.4,0.8);
+    \draw (3.6,0.8) to[C, l_=$C_{\text{ф2}}$] (3.6,-0.8);
+    \loadR{5.4}{0}
+  \end{scope}
+\end{tikzpicture}
+\end{document}

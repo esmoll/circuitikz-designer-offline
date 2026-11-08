@@ -1,0 +1,42 @@
+% Трёхфазная нулевая схема (три диода) — CircuitTikZ, в стиле bridge_circuitikz.tex
+% Три одинаковые вертикальные ветви (обмотка + диод на одной высоте),
+% точки-узлы только в T-соединениях
+\documentclass[border=4pt]{standalone}
+\usepackage{amsmath}
+\usepackage{fontspec}
+\setmainfont{Calibri}
+\usepackage[european, RPvoltages]{circuitikz}
+\definecolor{ink}{RGB}{31,42,51}
+\definecolor{grp}{RGB}{46,110,140}
+\ctikzset{bipoles/length=1.0cm}
+\ctikzset{bipoles/thickness=0.9}
+\ctikzset{diodes/fill=ink}      % залитые диоды (ГОСТ)
+\ctikzset{inductor=american}    % витки-полуокружности
+
+\begin{document}
+\begin{tikzpicture}[line width=1.0pt, color=ink, font=\small]
+  % --- три одинаковые вертикальные ветви: обмотка + диод на одной высоте
+  \foreach \x/\name/\ph in {0/VD1/a, 2.2/VD2/b, 4.4/VD3/c} {
+    \draw (\x,-1.8) to[L] (\x,0.6);
+    \draw (\x,0.6) -- (\x,2.4) to[D] (\x,3.0) -- (\x,4.6);
+    \node[anchor=west] at (\x+0.15,-0.6) {$\ph$};
+    \node[anchor=west] at (\x+0.35,2.7) {\name};
+  }
+  % --- нижняя шина с нулевым выводом N (угол a — без точки)
+  \draw (0,-1.8) -- (10.0,-1.8);
+  \node[anchor=east] at (-0.3,-1.8) {$N$};
+  \node[circ] at (2.2,-1.8) {};
+  \node[circ] at (4.4,-1.8) {};
+  % --- верхняя шина + (угол VD1 — без точки)
+  \draw (0,4.6) -- (10.0,4.6);
+  \node[circ] at (2.2,4.6) {};
+  \node[circ] at (4.4,4.6) {};
+  % --- нагрузка
+  \draw (10.0,4.6) -- (10.0,3.0) to[R] (10.0,1.0) -- (10.0,-1.8);
+  % --- подписи
+  \node[anchor=east] at (9.55,2.0) {$u_d$};
+  \node[anchor=west] at (10.45,2.0) {$R_{\text{н}}$};
+  \node[anchor=south west] at (9.95,4.62) {$+$};
+  \node[anchor=north west] at (9.95,-1.62) {$-$};
+\end{tikzpicture}
+\end{document}

@@ -1,0 +1,67 @@
+% Двухтактный преобразователь со средней точкой (push-pull).
+% Два ключа VT1/VT2 (MOSFET с индуцированным каналом) поочерёдно
+% подключают полуобмотки первички к источнику; выпрямитель на VD1/VD2
+% со средней точкой вторички. Гальваническая развязка.
+\documentclass[border=4pt]{standalone}
+\usepackage{amsmath}
+\usepackage{fontspec}
+\setmainfont{Calibri}
+\usepackage[european, RPvoltages]{circuitikz}
+\usetikzlibrary{arrows.meta, calc}
+\definecolor{ink}{RGB}{31,42,51}
+\definecolor{grp}{RGB}{46,110,140}
+\ctikzset{bipoles/length=1.0cm}
+\ctikzset{bipoles/thickness=0.9}
+\ctikzset{diodes/fill=ink}
+\ctikzset{inductor=american}
+
+\begin{document}
+\begin{tikzpicture}[line width=1.0pt, color=ink, font=\small]
+  % --- входные зажимы (открытые)
+  \draw (0.6,2.6) node[ocirc]{} node[above left]{$+$} -- (2.6,2.6);
+  \node[anchor=east] at (0.4,1.35) {$U_{\text{вх}}$};
+  % --- нижняя шина входа (общая для обоих ключей)
+  \draw (0.6,0.2) node[ocirc]{} node[below left]{$-$} -- (2.1,0.2);
+  % --- первичная обмотка: две полуобмотки со средней точкой
+  \draw (2.6,1.6) to[L, l=$w_1$] (2.6,2.6) node[circ]{} to[L] (2.6,4.0);
+  % --- ключи VT1/VT2 (пути снизу вверх, затворы влево)
+  \draw (1.6,0.2) node[circ]{} -- (1.6,0.45);
+  \draw (1.6,0.45) to[Tnigfete, name=VT1] (1.6,1.75)
+        -- (1.6,4.0) -- (2.6,4.0);
+  \draw (2.1,0.2) -- (2.1,0.45);
+  \draw (2.1,0.45) to[Tnigfete, name=VT2] (2.1,1.15)
+        -- (2.1,1.6) -- (2.6,1.6);
+  \node[anchor=east] at (1.5,1.55) {VT1};
+  \node[anchor=west] at (2.35,0.3) {VT2};
+  % --- затворы: ШИМ
+  \draw[grp] (VT1.G) -- ++(-0.5,0);
+  \node[anchor=east, text=grp] at ($(VT1.G)+(-0.55,0)$) {ШИМ};
+  \draw[grp] (VT2.G) -- ++(-0.5,0);
+  \node[anchor=east, text=grp] at ($(VT2.G)+(-0.55,0)$) {ШИМ};
+  % --- магнитопровод + вторичная обмотка: единая фигура
+  \draw[line width=0.8pt] (3.15,0.9) -- (3.15,4.3);
+  \draw[line width=0.8pt] (3.27,0.9) -- (3.27,4.3);
+  \draw (3.75,1.2) to[L, l_=$w_2$] (3.75,2.6) node[circ]{} to[L]
+        (3.75,4.0);
+  % --- точки одноимённых выводов
+  \fill (2.6,4.2) circle (1.6pt);
+  \fill (3.75,4.2) circle (1.6pt);
+  % --- выпрямитель: диоды от концов вторички, средняя точка — минус
+  \draw (3.75,4.0) -- (4.2,4.0) to[D, name=VD1] (5.0,4.0) -- (5.0,3.4);
+  \node[anchor=south] at (4.6,4.12) {VD1};
+  \draw (3.75,1.2) -- (4.2,1.2) to[D, name=VD2] (5.0,1.2) -- (5.0,3.4);
+  \node[anchor=north] at (4.6,1.08) {VD2};
+  % --- выходная шина +
+  \draw (5.0,3.4) -- (7.4,3.4);
+  % --- средняя точка вторички -> выходная шина -
+  \draw (3.75,2.6) -- (5.4,2.6) -- (5.4,0.2) -- (7.4,0.2);
+  % --- конденсатор и нагрузка
+  \draw (6.0,3.4) node[circ]{} to[C, l_=$C$] (6.0,0.2) node[circ]{};
+  \draw (6.8,3.4) node[circ]{} to[R, l=$R_{\text{н}}$] (6.8,0.2)
+        node[circ]{};
+  % --- выходные зажимы
+  \draw (7.4,3.4) node[ocirc]{} node[above right]{$+$};
+  \draw (7.4,0.2) node[ocirc]{} node[below right]{$-$};
+  \node[anchor=west] at (7.6,1.8) {$U_{\text{вых}}$};
+\end{tikzpicture}
+\end{document}

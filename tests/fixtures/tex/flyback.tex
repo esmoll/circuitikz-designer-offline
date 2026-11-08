@@ -1,0 +1,56 @@
+% Обратноходовой преобразователь (flyback).
+% Ключ VT (MOSFET с индуцированным каналом) в первичной цепи,
+% трансформатор: обмотки w1/w2 симметрично на общем магнитопроводе,
+% точки одноимённых выводов (встречное включение), диод VD и C, R_н
+% во вторичной цепи. Гальваническая развязка.
+\documentclass[border=4pt]{standalone}
+\usepackage{amsmath}
+\usepackage{fontspec}
+\setmainfont{Calibri}
+\usepackage[european, RPvoltages]{circuitikz}
+\usetikzlibrary{arrows.meta, calc}
+\definecolor{ink}{RGB}{31,42,51}
+\definecolor{grp}{RGB}{46,110,140}
+\ctikzset{bipoles/length=1.0cm}
+\ctikzset{bipoles/thickness=0.9}
+\ctikzset{diodes/fill=ink}
+\ctikzset{inductor=american}
+
+\begin{document}
+\begin{tikzpicture}[line width=1.0pt, color=ink, font=\small]
+  % --- входные зажимы (открытые)
+  \draw (0.6,3.2) node[ocirc]{} node[above left]{$+$} -- (2.2,3.2);
+  \node[anchor=east] at (0.4,1.6) {$U_{\text{вх}}$};
+  % --- первичная обмотка w1 (снизу вверх — дуги влево)
+  \draw (2.2,1.0) to[L, l=$w_1$] (2.2,3.2);
+  % --- ключ VT: корпус по центру между шиной и обмоткой
+  \draw (2.2,0) node[circ]{} -- (2.2,0.275);
+  \draw (2.2,0.275) to[Tnigfete, name=VT] (2.2,0.725) -- (2.2,1.0);
+  \node[anchor=east] at (1.78,0.55) {VT};
+  \draw[grp] (VT.G) -- ++(-0.5,0);
+  \node[anchor=east, text=grp] at ($(VT.G)+(-0.55,0)$) {ШИМ};
+  % --- нижняя шина первичной цепи
+  \draw (0.6,0) node[ocirc]{} node[below left]{$-$} -- (2.2,0);
+  % --- магнитопровод (две вертикальные линии, выше и ниже обмоток)
+  \draw[line width=0.8pt] (2.8,0.8) -- (2.8,3.4);
+  \draw[line width=0.8pt] (2.92,0.8) -- (2.92,3.4);
+  % --- вторичная обмотка w2 (снизу вверх — дуги влево, симметрично)
+  \draw (3.5,1.0) to[L, l_=$w_2$] (3.5,3.2);
+  % --- точки одноимённых выводов: начало w1 вверху, w2 внизу
+  \fill (2.44,3.0) circle (1.6pt);
+  \fill (3.26,1.2) circle (1.6pt);
+  % --- вторичная цепь: диод от верхнего вывода w2
+  \draw (3.5,3.2) -- (3.5,3.5) to[D, name=VD] (4.9,3.5) -- (6.5,3.5);
+  \node[anchor=south] at (4.15,3.62) {VD};
+  % --- нижняя шина ВТОРИЧНОЙ цепи (развязка!)
+  \draw (3.5,1.0) -- (3.5,0.5) -- (6.5,0.5);
+  % --- конденсатор и нагрузка
+  \draw (5.3,3.5) node[circ]{} to[C, l_=$C$] (5.3,0.5) node[circ]{};
+  \draw (6.1,3.5) node[circ]{} to[R, l=$R_{\text{н}}$] (6.1,0.5)
+        node[circ]{};
+  % --- выходные зажимы
+  \draw (6.5,3.5) node[ocirc]{} node[above right]{$+$};
+  \draw (6.5,0.5) node[ocirc]{} node[below right]{$-$};
+  \node[anchor=west] at (6.7,1.95) {$U_{\text{вых}}$};
+\end{tikzpicture}
+\end{document}

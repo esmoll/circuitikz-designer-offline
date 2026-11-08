@@ -67,7 +67,10 @@ Locked decisions:
   No new npm packages.
 
 Tracks: contract, preprocess, scanner, coords, mapping, pipeline, acceptance.
-32 cards total; `000` (types.ts) blocks most of them.
+31 cards total; `000` (types.ts) blocks most of them.
+
+Tests: put unit checks in `tools/tex-import/cases/<card id>.mjs` (they are
+discovered automatically). Never edit `tools/tex-import/run.mjs` from a card.
 
 ## Environment (Windows)
 

@@ -1,0 +1,46 @@
+% Звено повышенной частоты: структурная (блок-) схема преобразователя
+% со звеном ВЧ — концепция А.В. Кобзева.
+\documentclass[border=4pt]{standalone}
+\usepackage{amsmath}
+\usepackage{fontspec}
+\setmainfont{Calibri}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta, positioning, calc}
+\definecolor{ink}{RGB}{31,42,51}
+\definecolor{grp}{RGB}{46,110,140}
+\definecolor{light}{RGB}{233,247,245}
+
+\begin{document}
+\begin{tikzpicture}[
+  line width=1.0pt, color=ink, font=\small,
+  block/.style={draw=ink, fill=light, rounded corners=2pt,
+                minimum height=1.05cm, inner sep=5pt, align=center},
+  >={Stealth}]
+  % --- верхний ряд
+  \node[block] (set) {Сеть\\ $u_1$, $f_1$};
+  \node[block, right=0.85 of set] (vyp) {Выпрямитель\\ + фильтр};
+  \node[block, right=0.85 of vyp, fill=white, thick] (inv) {Инвертор ВЧ\\ (ШИМ)};
+  \node[block, right=0.85 of inv, fill=white, thick] (tr) {ВЧ-трансфор-\\матор};
+  % --- нижний ряд (змейкой)
+  \node[block, below=1.0 of tr] (dem) {Демодулятор\\ (ВЧ-выпрями-\\тель)};
+  \node[block, left=0.85 of dem] (fil) {Сглаживающий\\ фильтр};
+  \node[block, left=0.85 of fil] (nag) {Нагрузка};
+  % --- стрелки
+  \draw[->] (set) -- (vyp);
+  \draw[->] (vyp) -- (inv);
+  \draw[->] (inv) -- (tr);
+  \draw[->] (tr) -- (dem);
+  \draw[->] (dem) -- (fil);
+  \draw[->] (fil) -- (nag);
+  % --- частота звена
+  \node[text=grp, font=\footnotesize, anchor=west] at (inv.north west)
+       {\strut};
+  \node[text=grp, align=center, font=\footnotesize]
+       at ($(inv.north)!0.5!(tr.north)$) (lbl) {};
+  \node[text=grp, font=\footnotesize, below=0.32 of tr]
+       {$f_{\text{п}} = 20\ldots100$ кГц};
+  % --- развязка
+  \node[text=grp, font=\footnotesize, above=0.18 of tr]
+       {гальваническая развязка};
+\end{tikzpicture}
+\end{document}

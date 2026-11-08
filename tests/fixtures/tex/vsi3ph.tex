@@ -1,0 +1,62 @@
+% Трёхфазный мостовой АИН: C_d в звене постоянного тока, стойки
+% VT1-VT6 (MOSFET с изолированным затвором и индуцированным каналом)
+% с обратными диодами VD1-VD6, звезда нагрузки (горизонтальные ветви)
+\documentclass[border=4pt]{standalone}
+\usepackage{amsmath}
+\usepackage{fontspec}
+\setmainfont{Calibri}
+\usepackage[european, RPvoltages]{circuitikz}
+\definecolor{ink}{RGB}{31,42,51}
+\definecolor{grp}{RGB}{46,110,140}
+\ctikzset{bipoles/length=1.0cm}
+\ctikzset{bipoles/thickness=0.9}
+\ctikzset{diodes/fill=ink}
+\ctikzset{inductor=american}
+
+\begin{document}
+\begin{tikzpicture}[line width=1.0pt, color=ink, font=\small]
+  % --- источник U_d (по центру между шинами) и конденсатор звена C_d
+  \draw (0,1.0) to[V, l=$U_{\text{d}}$] (0,3.0);
+  \draw (0,3.0) -- (0,4.8);
+  \draw (0,1.0) -- (0,-0.8);
+  \node[anchor=east] at (-0.15,3.05) {$+$};
+  \node[anchor=east] at (-0.15,0.95) {$-$};
+  \draw (0.9,-0.8) node[circ]{} to[C, l_=$C_{\text{d}}$] (0.9,4.8) node[circ]{};
+  % --- шины DC (непрерывные: до последней диодной колонки)
+  \draw (0,-0.8) -- (7.9,-0.8);
+  \draw (0,4.8) -- (7.9,4.8);
+  \node[anchor=south] at (1.4,4.86) {$+$};
+  \node[anchor=north] at (1.4,-0.86) {$-$};
+  % --- три стойки VT (затвором влево), обратные диоды VD правее на 0.7
+  \foreach \xc/\yph/\xoff in {3.2/3.2/3.9, 5.2/2.2/5.9, 7.2/1.2/7.9}{
+    \draw (\xc,\yph) node[circ]{} -- (\xc,3.5) to[Tnigfete] (\xc,4.3)
+          -- (\xc,4.8) node[circ]{};
+    \draw (\xc,-0.8) node[circ]{} -- (\xc,-0.3) to[Tnigfete] (\xc,0.5)
+          -- (\xc,\yph) node[circ]{};
+    \draw (\xc,-0.8) node[circ]{} -- (\xoff,-0.8) -- (\xoff,-0.3)
+          to[D] (\xoff,0.5) -- (\xoff,\yph) node[circ]{} -- (\xoff,3.5)
+          to[D] (\xoff,4.3) -- (\xoff,4.8) node[circ]{} -- (\xc,4.8) node[circ]{};
+  }
+  % --- фазные провода и нагрузка звездой (ветви горизонтальные)
+  \draw (3.2,3.2) -- (8.6,3.2) to[generic, l_=$Z_{\text{a}}$] (9.6,3.2) -- (9.6,-1.0);
+  \draw (5.2,2.2) -- (9.9,2.2) to[generic, l_=$Z_{\text{b}}$] (10.9,2.2) -- (10.9,-1.0);
+  \draw (7.2,1.2) -- (11.2,1.2) to[generic, l=$Z_{\text{c}}$] (12.2,1.2) -- (12.2,-1.0);
+  \draw (9.6,-1.0) -- (12.2,-1.0);
+  \node[circ] at (10.9,-1.0) {};
+  \node[anchor=south west, font=\footnotesize] at (3.55,3.28) {a};
+  \node[anchor=south west, font=\footnotesize] at (5.55,2.28) {b};
+  \node[anchor=south west, font=\footnotesize] at (7.55,1.28) {c};
+  % --- подписи ключей (слева от затвора своего прибора)
+  \node[anchor=east, font=\footnotesize] at (2.78,3.9)  {VT1};
+  \node[anchor=east, font=\footnotesize] at (4.78,3.9)  {VT2};
+  \node[anchor=east, font=\footnotesize] at (6.78,3.9)  {VT3};
+  \node[anchor=east, font=\footnotesize] at (2.78,0.1)  {VT4};
+  \node[anchor=east, font=\footnotesize] at (4.78,0.1)  {VT5};
+  \node[anchor=east, font=\footnotesize] at (6.78,0.1)  {VT6};
+  \node[anchor=south, text=grp, font=\footnotesize, align=left] at (6.5,4.75)
+       {VT1--VT6 — ключи с изолированным затвором;\\ VD1--VD6 — обратные диоды};
+  \node[anchor=south, text=grp, font=\footnotesize, align=left] at (2.0,5.6)
+       {$C_{\text{d}}$ — источник напряжения звена; обратные диоды\\
+        возвращают энергию индуктивности нагрузки};
+\end{tikzpicture}
+\end{document}

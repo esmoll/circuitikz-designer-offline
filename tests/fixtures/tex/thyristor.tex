@@ -1,0 +1,25 @@
+% Обозначение тиристора с управляющим электродом — CircuitTikZ, стиль л7
+\documentclass[border=4pt]{standalone}
+\usepackage{amsmath}
+\usepackage{fontspec}
+\setmainfont{Calibri}
+\usepackage[european, RPvoltages]{circuitikz}
+\usetikzlibrary{arrows.meta}
+\definecolor{ink}{RGB}{31,42,51}
+\definecolor{grp}{RGB}{46,110,140}
+\ctikzset{bipoles/length=1.4cm}
+\ctikzset{bipoles/thickness=0.9}
+\ctikzset{diodes/fill=ink}
+\ctikzset{inductor=american}
+
+\begin{document}
+\begin{tikzpicture}[line width=1.0pt, color=ink, font=\small]
+  % --- тиристор: анод сверху, катод снизу (один путь — без швов)
+  \draw (0,2.6) node[above]{$А$ (анод)}
+        to[Ty, name=VS] (0,-0.4) node[below]{$К$ (катод)};
+  % --- управляющий электрод (подпись у конца штриха затвора)
+  \node[anchor=west, text=grp] at (VS.G) {УЭ};
+  % --- ток
+  \draw[-{Stealth}, thin, grp] (-0.6,1.7) -- (-0.6,0.8) node[midway, left, text=grp]{$i_{\mathrm{VS}}$};
+\end{tikzpicture}
+\end{document}

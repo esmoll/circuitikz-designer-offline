@@ -1,0 +1,37 @@
+% Регулятор переменного напряжения на встречно-параллельных тиристорах.
+% Фазовое управление: VS1 проводит положительную полуволну,
+% VS2 — отрицательную; нагрузка R_н.
+\documentclass[border=4pt]{standalone}
+\usepackage{amsmath}
+\usepackage{fontspec}
+\setmainfont{Calibri}
+\usepackage[european, RPvoltages]{circuitikz}
+\definecolor{ink}{RGB}{31,42,51}
+\definecolor{grp}{RGB}{46,110,140}
+\ctikzset{bipoles/length=1.0cm}
+\ctikzset{bipoles/thickness=0.9}
+\ctikzset{diodes/fill=ink}
+\ctikzset{inductor=american}
+
+\begin{document}
+\begin{tikzpicture}[line width=1.0pt, color=ink, font=\small]
+  % --- источник сети (синус)
+  \draw (0,3.4) to[sV, l=$u_1$] (0,0);
+  % --- верхняя шина до пары тиристоров
+  \draw (0,3.4) -- (1.8,3.4) node[circ]{};
+  % --- встречно-параллельные тиристоры между узлами P1 и P2
+  \draw (1.8,3.4) to[Ty, name=VS1] (4.2,3.4) node[circ]{};
+  \draw (1.8,3.4) -- (1.8,2.0);
+  \draw (4.2,3.4) -- (4.2,2.0);
+  \draw (4.2,2.0) to[Ty, name=VS2] (1.8,2.0);
+  % --- подписи тиристоров (затворы УЭ — частью символа)
+  \node[anchor=south] at (3.0,3.85) {VS1};
+  \node[anchor=north] at (3.1,1.55) {VS2};
+  % --- верхняя шина от P2 к нагрузке
+  \draw (4.2,3.4) -- (6.0,3.4);
+  % --- нагрузка
+  \draw (6.0,3.4) to[R, l_=$R_{\text{н}}$] (6.0,0);
+  % --- нижняя шина
+  \draw (6.0,0) -- (0,0);
+\end{tikzpicture}
+\end{document}

@@ -1,0 +1,32 @@
+% Г-образный LC-фильтр: выпрямитель (вход слева) — дроссель — конденсатор — Rн
+\documentclass[border=4pt]{standalone}
+\usepackage{amsmath}
+\usepackage{fontspec}
+\setmainfont{Calibri}
+\usepackage[european, RPvoltages]{circuitikz}
+\definecolor{ink}{RGB}{31,42,51}
+\definecolor{grp}{RGB}{46,110,140}
+\ctikzset{bipoles/length=1.0cm}
+\ctikzset{bipoles/thickness=0.9}
+\ctikzset{diodes/fill=ink}
+\ctikzset{inductor=american}
+
+\begin{document}
+\begin{tikzpicture}[line width=1.0pt, color=ink, font=\small]
+  % --- входные зажимы выпрямителя: постоянная ЭДС E0 + пульсации u~
+  \draw (0,1.4) to[sV, l_=$u_{\sim}$] (0,0)
+        to[battery1, l_=$E_0$] (0,-1.4);
+  % --- дроссель (переменная составляющая падает на нём)
+  \draw (0,1.4) -- (0.8,1.4) to[L, l=$L_{\text{ф}}$] (2.8,1.4) node[circ]{} -- (4.4,1.4);
+  % --- конденсатор фильтра
+  \draw (0,-1.4) -- (2.8,-1.4);
+  \draw (2.8,1.4) to[C, l_=$C_{\text{ф}}$, i=$i_C$] (2.8,-1.4);
+  \draw (2.8,-1.4) -- (4.4,-1.4);
+  % --- нагрузка
+  \draw (4.4,1.4) to[R, l=$R_{\text{н}}$, i=$i_{\text{н}}$] (4.4,-1.4);
+  % --- токи и подписи
+  \node[anchor=south] at (0.35,1.5) {$i_{\text{d}}$};
+  \node[anchor=south, text=grp, font=\footnotesize] at (2.2,2.0)
+       {Г-образный LC-фильтр};
+\end{tikzpicture}
+\end{document}

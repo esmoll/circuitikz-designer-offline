@@ -1,0 +1,48 @@
+% Понижающий (buck) регулятор постоянного напряжения.
+% Ключ VT (MOSFET с индуцированным каналом) в верхней шине, обратный
+% диод VD, дроссель L последовательно с нагрузкой, C параллельно R_н.
+\documentclass[border=4pt]{standalone}
+\usepackage{amsmath}
+\usepackage{fontspec}
+\setmainfont{Calibri}
+\usepackage[european, RPvoltages]{circuitikz}
+\usetikzlibrary{arrows.meta, calc}
+\definecolor{ink}{RGB}{31,42,51}
+\definecolor{grp}{RGB}{46,110,140}
+\ctikzset{bipoles/length=1.0cm}
+\ctikzset{bipoles/thickness=0.9}
+\ctikzset{diodes/fill=ink}
+\ctikzset{inductor=american}
+
+\begin{document}
+\begin{tikzpicture}[line width=1.0pt, color=ink, font=\small]
+  % --- входные зажимы (открытые)
+  \draw (0.6,3.4) node[ocirc]{} node[above left]{$+$} -- (1.6,3.4);
+  \draw (0.6,0) node[ocirc]{} node[below left]{$-$} -- (7.4,0);
+  \node[anchor=east] at (0.4,1.7) {$U_{\text{вх}}$};
+  % --- верхняя шина: вход -> VT -> узел A -> L -> выход
+  %     (путь VT справа налево — затвор выходит вниз)
+  \draw (0.6,3.4) -- (1.6,3.4);
+  \draw (3.4,3.4) node[circ]{} to[Tnigfete, name=VT] (1.6,3.4);
+  \draw (3.4,3.4) to[L, l_=$L$] (5.8,3.4) node[circ]{} -- (7.4,3.4);
+  \node[anchor=east] at (2.2,2.9) {VT};
+  % --- затвор: импульсы ШИМ
+  \draw[grp] (VT.G) -- ++(0,-0.5);
+  \node[anchor=north, text=grp] at ($(VT.G)+(0,-0.55)$) {ШИМ};
+  % --- обратный диод VD: катод в узле A (остриё вверх), анод на шине -
+  \draw (3.4,3.4) -- (3.4,2.6);
+  \draw (3.4,1.2) to[D, name=VD] (3.4,2.6);
+  \draw (3.4,1.2) -- (3.4,0) node[circ]{};
+  \node[anchor=west] at (3.65,1.9) {VD};
+  % --- конденсатор и нагрузка на выходе
+  \draw (5.8,3.4) to[C, l_=$C$] (5.8,0) node[circ]{};
+  \draw (6.8,3.4) node[circ]{} to[R, l=$R_{\text{н}}$] (6.8,0) node[circ]{};
+  % --- выходные зажимы
+  \draw (7.4,3.4) node[ocirc]{} node[above right]{$+$};
+  \draw (7.4,0) node[ocirc]{} node[below right]{$-$};
+  \node[anchor=west] at (7.6,1.7) {$U_{\text{вых}}$};
+  % --- ток дросселя (стрелка над L)
+  \draw[-{Stealth}, thin, grp] (4.0,3.85) -- (4.9,3.85)
+        node[midway, above, text=grp]{$i_L$};
+\end{tikzpicture}
+\end{document}

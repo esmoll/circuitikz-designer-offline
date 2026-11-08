@@ -1,0 +1,47 @@
+% Повышающий (boost) регулятор постоянного напряжения.
+% Дроссель L на входе, ключ VT (MOSFET с индуцированным каналом)
+% на землю, диод VD на выход, C параллельно R_н.
+\documentclass[border=4pt]{standalone}
+\usepackage{amsmath}
+\usepackage{fontspec}
+\setmainfont{Calibri}
+\usepackage[european, RPvoltages]{circuitikz}
+\usetikzlibrary{arrows.meta, calc}
+\definecolor{ink}{RGB}{31,42,51}
+\definecolor{grp}{RGB}{46,110,140}
+\ctikzset{bipoles/length=1.0cm}
+\ctikzset{bipoles/thickness=0.9}
+\ctikzset{diodes/fill=ink}
+\ctikzset{inductor=american}
+
+\begin{document}
+\begin{tikzpicture}[line width=1.0pt, color=ink, font=\small]
+  % --- входные зажимы (открытые)
+  \draw (0.6,3.4) node[ocirc]{} node[above left]{$+$} -- (1.4,3.4);
+  \node[anchor=east] at (0.4,1.7) {$U_{\text{вх}}$};
+  % --- верхняя шина: вход -> L -> узел A -> VD -> выход
+  \draw (1.4,3.4) to[L, l_=$L$] (3.0,3.4) node[circ]{} -- (3.6,3.4)
+        to[D, name=VD] (5.2,3.4) -- (7.4,3.4);
+  % --- ток дросселя
+  \draw[-{Stealth}, thin, grp] (1.6,3.85) -- (2.5,3.85)
+        node[midway, above, text=grp]{$i_L$};
+  % --- ключ VT: земля -> узел A (путь снизу вверх, затвор влево)
+  \draw (3.0,0) node[circ]{} to[Tnigfete, name=VT] (3.0,2.7)
+        -- (3.0,3.4);
+  \node[anchor=west] at (3.5,2.25) {VT};
+  % --- затвор: импульсы ШИМ (влево)
+  \draw[grp] (VT.G) -- ++(-0.5,0);
+  \node[anchor=east, text=grp] at ($(VT.G)+(-0.55,0)$) {ШИМ};
+  % --- диод: подпись сверху
+  \node[anchor=south] at (4.4,3.85) {VD};
+  % --- нижняя шина
+  \draw (0.6,0) node[ocirc]{} node[below left]{$-$} -- (7.4,0);
+  % --- конденсатор и нагрузка
+  \draw (5.8,3.4) node[circ]{} to[C, l_=$C$] (5.8,0) node[circ]{};
+  \draw (6.8,3.4) node[circ]{} to[R, l=$R_{\text{н}}$] (6.8,0) node[circ]{};
+  % --- выходные зажимы
+  \draw (7.4,3.4) node[ocirc]{} node[above right]{$+$};
+  \draw (7.4,0) node[ocirc]{} node[below right]{$-$};
+  \node[anchor=west] at (7.6,1.7) {$U_{\text{вых}}$};
+\end{tikzpicture}
+\end{document}

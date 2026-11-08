@@ -1,0 +1,48 @@
+% Однофазная нулевая (двухполупериодная) схема на тиристорах с VD0
+\documentclass[border=4pt]{standalone}
+\usepackage{amsmath}
+\usepackage{fontspec}
+\setmainfont{Calibri}
+\usepackage[european, RPvoltages]{circuitikz}
+\definecolor{ink}{RGB}{31,42,51}
+\definecolor{grp}{RGB}{46,110,140}
+\ctikzset{bipoles/length=1.0cm}
+\ctikzset{bipoles/thickness=0.9}
+\ctikzset{diodes/fill=ink}
+\ctikzset{inductor=american}
+
+\begin{document}
+\begin{tikzpicture}[line width=1.0pt, color=ink, font=\small]
+  % --- вторичная обмотка со средней точкой: w1 (верхняя), w2 (нижняя)
+  \draw (0,3.4) to[L] (0,1.4);
+  \draw (1.8,1.4) to[L] (1.8,-0.6);
+  % --- средняя точка N и шина минуса (угол обмотки a — без точки)
+  \draw (0,1.4) -- (1.8,1.4) node[circ]{} -- (8.2,1.4);
+  \node[anchor=south west] at (0.55,1.44) {$N$};
+  % --- тиристор VS1 (от верхней полуобмотки к шине +, один путь)
+  \draw (0,3.4) to[Ty, name=VS1] (0,5.05) node[circ]{};
+  % --- тиристор VS2 (от нижней полуобмотки, обход слева)
+  \draw (1.8,-0.6) -- (1.8,-1.35) -- (-1.6,-1.35)
+        -- (-1.6,3.95) to[Ty, name=VS2] (-1.6,4.75) -- (-1.6,5.05) node[circ]{};
+  % --- шина плюса
+  \draw (-1.6,5.05) -- (8.2,5.05);
+  % --- обратный (нулевой) диод VD0: катод к шине +
+  \draw (6.9,5.05) node[circ]{} -- (6.9,3.75);
+  \draw (6.9,2.95) to[D] (6.9,3.75);
+  \draw (6.9,2.95) -- (6.9,1.4) node[circ]{};
+  % --- нагрузка
+  \draw (8.2,5.05) -- (8.2,3.7) to[R] (8.2,1.75) -- (8.2,1.4);
+  % --- подписи
+  \node[anchor=south west] at (0.08,3.42) {$a$};
+  \node[anchor=north west] at (1.88,-0.62) {$b$};
+  \node[anchor=west] at (0.3,4.35) {VS1};
+  \node[anchor=west] at (-1.25,4.35) {VS2};
+  \node[anchor=east] at (6.5,3.35) {VD0};
+  \node[anchor=east] at (7.75,3.2) {$u_d$};
+  \node[anchor=west] at (8.65,2.7) {$R_{\text{н}}$};
+  \node[anchor=south west] at (8.15,5.07) {$+$};
+  \node[anchor=north west] at (8.15,1.38) {$-$};
+  % --- вентили управления (подпись у затвора VS2)
+  \node[anchor=north east, text=grp, font=\footnotesize] at (VS2.G) {от СИФУ};
+\end{tikzpicture}
+\end{document}

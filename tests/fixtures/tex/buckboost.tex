@@ -1,0 +1,52 @@
+% Инвертирующий (buck-boost) регулятор постоянного напряжения.
+% Ключ VT (MOSFET с индуцированным каналом), дроссель L на землю,
+% диод VD на выход; полярность выходного напряжения обратная.
+\documentclass[border=4pt]{standalone}
+\usepackage{amsmath}
+\usepackage{fontspec}
+\setmainfont{Calibri}
+\usepackage[european, RPvoltages]{circuitikz}
+\usetikzlibrary{arrows.meta, calc}
+\definecolor{ink}{RGB}{31,42,51}
+\definecolor{grp}{RGB}{46,110,140}
+\ctikzset{bipoles/length=1.0cm}
+\ctikzset{bipoles/thickness=0.9}
+\ctikzset{diodes/fill=ink}
+\ctikzset{inductor=american}
+
+\begin{document}
+\begin{tikzpicture}[line width=1.0pt, color=ink, font=\small]
+  % --- входные зажимы (открытые)
+  \draw (0.6,3.4) node[ocirc]{} node[above left]{$+$} -- (1.6,3.4);
+  \node[anchor=east] at (0.4,1.7) {$U_{\text{вх}}$};
+  % --- верхняя шина: вход -> VT -> узел A (шина ЗАКАНЧИВАЕТСЯ в узле A)
+  %     (путь VT справа налево — затвор выходит вниз)
+  \draw (0.6,3.4) -- (1.6,3.4);
+  \draw (3.4,3.4) node[circ]{} to[Tnigfete, name=VT] (1.6,3.4);
+  \node[anchor=east] at (2.2,2.9) {VT};
+  % --- затвор: импульсы ШИМ
+  \draw[grp] (VT.G) -- ++(0,-0.5);
+  \node[anchor=north, text=grp] at ($(VT.G)+(0,-0.55)$) {ШИМ};
+  % --- дроссель L: узел A -> земля (снизу вверх — дуги влево)
+  \draw (3.4,0) node[circ]{} to[L, l_=$L$] (3.4,3.4);
+  % --- ток дросселя (вниз, стрелка справа от L)
+  \draw[-{Stealth}, thin, grp] (4.0,2.6) -- (4.0,1.7)
+        node[midway, right, text=grp]{$i_L$};
+  % --- диод VD: анод в узле B (выход), катод в узле A (остриё влево)
+  \draw (5.4,3.4) node[circ]{} to[D, name=VD] (3.4,3.4);
+  \node[anchor=south] at (4.4,3.6) {VD};
+  % --- нижняя шина
+  \draw (0.6,0) node[ocirc]{} node[below left]{$-$} -- (7.4,0);
+  % --- конденсатор и нагрузка (между узлом B и нижней шиной)
+  \draw (5.4,3.4) to[C, l_=$C$] (5.4,0) node[circ]{};
+  \draw (5.4,3.4) -- (6.6,3.4);
+  \draw (6.6,3.4) node[circ]{} to[R, l=$R_{\text{н}}$] (6.6,0) node[circ]{};
+  % --- выходные зажимы: ПОЛЯРНОСТЬ ОБРАТНАЯ
+  \draw (6.6,3.4) -- (7.4,3.4) node[ocirc]{} node[above right]{$-$};
+  \draw (7.4,0) node[ocirc]{} node[below right]{$+$};
+  \node[anchor=west] at (7.6,1.7) {$U_{\text{вых}}$};
+  % --- пометка
+  \node[anchor=south, text=grp, font=\footnotesize] at (3.4,-0.55)
+       {полярность выходного напряжения обратная};
+\end{tikzpicture}
+\end{document}
