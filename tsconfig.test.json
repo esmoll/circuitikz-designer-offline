@@ -7,6 +7,12 @@
 		"module": "CommonJS",
 		"moduleResolution": "node",
 		"target": "ES2022",
+		// Emit must not depend on the app sources type-checking under this config: the
+		// importer pulls the component graph in through a type-only import, and those
+		// files (Iterator.toArray under lib ES2022, import.meta under CommonJS) do not
+		// compile here. Behaviour is verified at runtime by the case files; type errors
+		// in the importer are caught by `npx tsc --noEmit -p tsconfig.json`.
+		"noCheck": true,
 		"skipLibCheck": true,
 		"esModuleInterop": true,
 		"resolveJsonModule": true
