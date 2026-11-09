@@ -296,6 +296,29 @@ export async function run(ctx) {
 		ctx.assert(bc.report[0].text === "(A)", `warning text ${JSON.stringify(bc.report[0].text)}, expected "(A)"`)
 	}
 
+	// 12c. a bare sub-node anchor (VT.G) resolves through the anchor resolver —
+	// this used to be a warned skip (review round two)
+	{
+		const bc = makeCtx({
+			coords: {
+				named: new Map([["VT", { x: 1, y: 0 }]]),
+				anchors: { resolve: (node, anchor) => (node === "VT" && anchor === "G" ? { x: 0.7, y: 0.3 } : null) },
+			},
+		})
+		const wires = handle(cmd("(VT.G) -- (2,0)"), bc)
+		ctx.assert(wires.length === 1, `(VT.G) wire: expected 1 wire, got ${wires.length}`)
+		expectWire(wires[0], 0.7 * PX, -0.3 * PX, 2 * PX, 0, "(VT.G) resolves to the symbol pin")
+		ctx.assert(bc.report.length === 0, `(VT.G) wire: no warning expected, got ${JSON.stringify(bc.report)}`)
+	}
+	{
+		// a dotted anchor over a known node with no resolver falls back to the
+		// component point (card 033's fallback) — the wire is not lost
+		const bc = makeCtx({ coords: { named: new Map([["VT", { x: 1, y: 0 }]]) } })
+		const wires = handle(cmd("(VT.G) -- (2,0)"), bc)
+		ctx.assert(wires.length === 1, `(VT.G) fallback wire: expected 1 wire, got ${wires.length}`)
+		expectWire(wires[0], PX, 0, 2 * PX, 0, "(VT.G) falls back to the component point")
+	}
+
 	// 13. non-draw kinds are never dispatched (direct handle calls stay out of contract)
 	{
 		const gotNode = canHandle({ ...cmd("(0,0) -- (1,0)"), kind: "node" })

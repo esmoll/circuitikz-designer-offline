@@ -8,6 +8,7 @@
 import type { BuildContext, CommandHandler, ComponentSaveObject, Point, RawCommand } from "../types"
 import { splitPath } from "../scanner/statements"
 import { resolveAbsolute, toDesignerPoint } from "../coords/absolute"
+import { resolveAnchor } from "../coords/anchors"
 import { resolveRelative } from "../coords/relative"
 import { resolveNamed } from "../coords/named"
 import { resolveCalcOffset } from "../coords/calcOffset"
@@ -27,9 +28,13 @@ const wireOperators = new Set(["--", "-|", "|-"])
  * Resolvers tried in order for every coordinate of a segment; the first
  * non-null result wins and commits `ctx.coords.lastPoint`.
  *
+ * `resolveAnchor` (card `033`) covers the bare sub-node anchor `(VT.G)` that
+ * the corpus wires between; `resolveNamed` deliberately excludes dotted names,
+ * so it must sit before it.
+ *
  * @readonly
  */
-const resolvers = [resolveAbsolute, resolveRelative, resolveNamed, resolveCalcOffset, resolveCalcPartway]
+const resolvers = [resolveAbsolute, resolveRelative, resolveNamed, resolveAnchor, resolveCalcOffset, resolveCalcPartway]
 
 /**
  * Resolves one raw coordinate text against the chain of resolvers.
