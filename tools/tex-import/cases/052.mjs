@@ -55,9 +55,9 @@ export async function run(ctx) {
 	{
 		const { saveFile, result } = texToSaveFile(readFixture("buck.tex"), "buck.tex")
 		ctx.assert(saveFile.version === "0.1", `saveFile.version must be "0.1", got ${JSON.stringify(saveFile.version)}`)
-		ctx.assert(saveFile.components.length === 24, `buck.tex must produce 24 components (card acceptance: more than 0), got ${saveFile.components.length}`)
+		ctx.assert(saveFile.components.length === 27, `buck.tex must produce 27 components (card acceptance: more than 0), got ${saveFile.components.length}`)
 		const counts = census(saveFile.components)
-		ctx.assert(counts.wire === 4 && counts.path === 5 && counts.node === 15, `buck census must be {wire: 4, path: 5, node: 15}, got ${JSON.stringify(counts)}`)
+		ctx.assert(counts.wire === 7 && counts.path === 5 && counts.node === 15, `buck census must be {wire: 7, path: 5, node: 15}, got ${JSON.stringify(counts)}`)
 		ctx.assert(result.skipped.length === 3, `buck.tex must report exactly 3 warnings, got ${result.skipped.length}`)
 		const [thickness, anchor, colour] = result.skipped
 		// (a) card 013 — bipoles/thickness is the one ctikzset key its recognised list excludes
@@ -115,7 +115,7 @@ export async function run(ctx) {
 		ctx.assert(badWarnings.length === 0, `every warning needs line >= 1, non-empty text (or the cell.tex {line: 1, text: ""} shape) and a reason, got ${badWarnings.join("; ")}`)
 	}
 
-	// aggregate sanity — the whole pipeline end to end across the corpus (current: 849)
+	// aggregate sanity — the whole pipeline end to end across the corpus (current: 923)
 	{
 		let total = 0
 		for (const name of names) {
