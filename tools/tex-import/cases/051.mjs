@@ -40,7 +40,7 @@ export async function run(ctx) {
 		const cmds = tokenize(doc)
 		const result = buildComponents(cmds, doc)
 
-		ctx.assert(result.components.length === 4, `exactly 4 components, got ${result.components.length}: ${JSON.stringify(result.components.map((c) => c.type))}`)
+		ctx.assert(result.components.length === 5, `exactly 5 components (the fill dot is a circ node now), got ${result.components.length}: ${JSON.stringify(result.components.map((c) => c.type))}`)
 		ctx.assert(
 			result.components[0].type === "wire",
 			`the first component must be the wire of line 1, got ${JSON.stringify(result.components[0].type)}`
@@ -73,12 +73,23 @@ export async function run(ctx) {
 			result.components[3].type === "node" && result.components[3].label && result.components[3].label.value === "A",
 			`the fourth component must be the text node A, got ${JSON.stringify(result.components[3])}`
 		)
-		ctx.assert(result.skipped.length === 1, `exactly 1 warning, got ${JSON.stringify(result.skipped)}`)
+		// the \fill dot is translated into a circ pole node (review round on card 051)
+		ctx.assert(result.skipped.length === 0, `no warnings expected, got ${JSON.stringify(result.skipped)}`)
+		const dot = result.components[4]
 		ctx.assert(
-			result.skipped[0].reason === "unsupported command",
-			`the \\fill must be reported as unsupported, got ${JSON.stringify(result.skipped[0].reason)}`
+			dot.type === "node" && dot.id === "circ",
+			`the fifth component must be the circ pole node from the \\fill, got ${JSON.stringify(dot)}`
 		)
-		ctx.assert(result.skipped[0].line === 5, `the \\fill warning must carry line 5, got ${JSON.stringify(result.skipped[0].line)}`)
+		ctx.approx(dot.position.x, 0, 1e-9)
+		ctx.approx(dot.position.y, 0, 1e-9)
+	}
+
+	// other \fill shapes stay unsupported
+	{
+		const doc = makeDoc("\\fill (0,0) rectangle (1,1);\n")
+		const result = buildComponents(tokenize(doc), doc)
+		ctx.assert(result.components.length === 0, `a fill rectangle emits nothing, got ${result.components.length}`)
+		ctx.assert(result.skipped.length === 1 && result.skipped[0].reason === "unsupported command", `a fill rectangle keeps the unsupported warning, got ${JSON.stringify(result.skipped)}`)
 	}
 
 	// named coordinates survive across commands. bipoles.ts registers name=VT at
@@ -124,7 +135,7 @@ export async function run(ctx) {
 
 	// duplicate warnings collapse per (line, reason)
 	{
-		const doc = makeDoc("\\fill (0,0) circle (1pt); \\fill (0,0) circle (1pt);")
+		const doc = makeDoc("\\fill (0,0) rectangle (1,1); \\fill (0,0) rectangle (1,1);")
 		const cmds = tokenize(doc)
 		const result = buildComponents(cmds, doc)
 		ctx.assert(
@@ -133,10 +144,18 @@ export async function run(ctx) {
 		)
 	}
 	{
-		const doc = makeDoc("\\fill (0,0) circle (1pt);\n\\fill (0,0) circle (1pt);")
+		const doc = makeDoc("\\fill (0,0) rectangle (1,1);\n\\fill (0,0) rectangle (1,1);")
 		const cmds = tokenize(doc)
 		const result = buildComponents(cmds, doc)
 		ctx.assert(result.skipped.length === 2, `different lines must keep two warnings, got ${JSON.stringify(result.skipped)}`)
+	}
+	{
+		// fill circles themselves are circ nodes now — two of them emit two components
+		const doc = makeDoc("\\fill (0,0) circle (1pt); \\fill (1,1) circle (1pt);")
+		const cmds = tokenize(doc)
+		const result = buildComponents(cmds, doc)
+		ctx.assert(result.components.length === 2, `two fill dots become two circ nodes, got ${result.components.length}`)
+		ctx.assert(result.skipped.length === 0, `fill dots carry no warnings, got ${JSON.stringify(result.skipped)}`)
 	}
 
 	// anchor flushing with line rewrite. The resolver is consulted through the
