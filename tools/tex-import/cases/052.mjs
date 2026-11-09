@@ -50,7 +50,7 @@ export async function run(ctx) {
 	}
 
 	// buck.tex — card acceptance plus the current exact reality, so regressions scream.
-	// The 3 warnings are the documented deviation from the aspirational "skipped === 0";
+	// The 2 warnings are the documented deviation from the aspirational "skipped === 0";
 	// one per line below, each naming its owning card.
 	{
 		const { saveFile, result } = texToSaveFile(readFixture("buck.tex"), "buck.tex")
@@ -58,12 +58,8 @@ export async function run(ctx) {
 		ctx.assert(saveFile.components.length === 27, `buck.tex must produce 27 components (card acceptance: more than 0), got ${saveFile.components.length}`)
 		const counts = census(saveFile.components)
 		ctx.assert(counts.wire === 7 && counts.path === 5 && counts.node === 15, `buck census must be {wire: 7, path: 5, node: 15}, got ${JSON.stringify(counts)}`)
-		ctx.assert(result.skipped.length === 3, `buck.tex must report exactly 3 warnings, got ${result.skipped.length}`)
-		const [thickness, anchor, colour] = result.skipped
-		// (a) card 013 — bipoles/thickness is the one ctikzset key its recognised list excludes
-		ctx.assert(thickness.line === 13, `buck warning (a) must sit on line 13, got ${thickness.line}`)
-		ctx.assert(thickness.text === "bipoles/thickness", `buck warning (a) must name the bipoles/thickness key, got ${JSON.stringify(thickness.text)}`)
-		ctx.assert(thickness.reason === "unknown ctikzset key", `buck warning (a) must be card 013's unknown-key warning, got ${JSON.stringify(thickness.reason)}`)
+		ctx.assert(result.skipped.length === 2, `buck.tex must report exactly 2 warnings, got ${result.skipped.length}`)
+		const [anchor, colour] = result.skipped
 		// (b) card 051 — the resolveAnchor chain gap: (VT.G) cannot be resolved, wire skipped
 		ctx.assert(anchor.line === 30, `buck warning (b) must sit on line 30, got ${anchor.line}`)
 		ctx.assert(anchor.text === "(VT.G)", `buck warning (b) must name the unresolvable (VT.G) coordinate, got ${JSON.stringify(anchor.text)}`)

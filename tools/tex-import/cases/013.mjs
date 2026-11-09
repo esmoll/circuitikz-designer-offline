@@ -87,7 +87,7 @@ export async function run(ctx) {
 	}
 	{
 		const d = applySettings(makeDoc("\\ctikzset{bipoles/thickness=0.9}\n\\ctikzset{diodes/fill=ink}\n\\ctikzset{diodes/empty=bg}\n"))
-		ctx.assert(d.warnings.length === 1, `bipoles/thickness is the only warning; diodes colour keys silent, got ${JSON.stringify(d.warnings)}`)
+		ctx.assert(d.warnings.length === 0, `bipoles/thickness is recognised and silent (review round), diodes colour keys silent, got ${JSON.stringify(d.warnings)}`)
 	}
 
 	// comma splitting outside braces and combined statements
