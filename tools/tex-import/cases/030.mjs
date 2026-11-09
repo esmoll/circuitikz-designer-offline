@@ -58,6 +58,38 @@ export async function run(ctx) {
 	expectNull("", 0, "empty token")
 	expectNull("++(1,2)", 0, "relative prefix belongs to card 031")
 
+
+	// --- arithmetic sums (review round: foreach expansion leaves 0+0.15) ---
+	{
+		const r = resolve("(0+0.15,-0.6)")
+		ctx.assert(r !== null, `sum (0+0.15,-0.6) must resolve, got ${JSON.stringify(r)}`)
+		ctx.approx(r.point.x, 0.15, 1e-9)
+		ctx.approx(r.point.y, -0.6, 1e-9)
+		ctx.assert(r.next === 13, `next sits past the closing paren, got ${r.next}`)
+	}
+	{
+		const r = resolve("(2.2+0.35, 2.7)")
+		ctx.assert(r !== null, `sum (2.2+0.35, 2.7) must resolve, got ${JSON.stringify(r)}`)
+		ctx.approx(r.point.x, 2.55, 1e-9)
+		ctx.approx(r.point.y, 2.7, 1e-9)
+	}
+	{
+		const r = resolve("(1 - 0.5, 0)")
+		ctx.assert(r !== null, `difference (1 - 0.5, 0) must resolve, got ${JSON.stringify(r)}`)
+		ctx.approx(r.point.x, 0.5, 1e-9)
+	}
+	{
+		const r = resolve("(-0.3,-1.8)")
+		ctx.assert(r !== null && r.point.x === -0.3, `signed plain number unchanged, got ${JSON.stringify(r)}`)
+	}
+	{
+		const r = resolve("(1+2+3,0)")
+		ctx.assert(r !== null && r.point.x === 6, `three-term sum evaluates, got ${JSON.stringify(r)}`)
+	}
+	expectNull("(a+b,0)", 0, "letters are pgfmath, not this subset")
+	expectNull("((1+2),0)", 0, "parentheses are pgfmath, not this subset")
+	expectNull("(1cm+2cm,0)", 0, "units inside a sum are not supported")
+
 	// --- unit conversion ---------------------------------------------------
 	ctx.approx(PX_PER_CM, 4800 / 127)
 

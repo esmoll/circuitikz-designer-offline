@@ -38,13 +38,41 @@ const unitToCm: Record<string, number> = {
 const numberPattern = /^([+-]?(?:\d+(?:\.\d*)?|\.\d+))\s*([a-z]*)$/i
 
 /**
+ * Characters a plain arithmetic sum may contain: numbers, signs, dots, blanks.
+ *
+ * TikZ evaluates arithmetic inside coordinate components, and card `012`'s
+ * foreach expansion turns `\x+0.15` into `0+0.15`, so a component can arrive
+ * as a sum of plain numbers (`(0+0.15,-0.6)`). Anything with letters or
+ * parentheses stays out — that is pgfmath territory, not this subset.
+ *
+ * @readonly
+ */
+const sumCharacters = /^[+-\d.\s]+$/
+
+/**
  * Converts a single coordinate component to centimetres.
  *
- * @param raw - one side of the comma, e.g. ` 1.6 ` or `10mm`
+ * A component that is a sum of plain numbers (`0+0.15`, `1 - 0.5`) is
+ * evaluated left to right; a single number keeps its unit handling. Units
+ * inside a sum are not supported — TikZ would need pgfmath for that.
+ *
+ * @param raw - one side of the comma, e.g. ` 1.6 `, `10mm` or `0+0.15`
  * @returns the value in cm, or `null` if it is not a number or has an unknown unit
  */
 function toCentimetres(raw: string): number | null {
-	const match = numberPattern.exec(raw.trim())
+	const text = raw.trim()
+
+	if (sumCharacters.test(text) && /[+-]/.test(text)) {
+		const compact = text.replace(/\s+/g, "")
+		const terms = compact.match(/[+-]?(?:\d+(?:\.\d*)?|\.\d+)/g)
+		if (terms && terms.length > 1) {
+			let sum = 0
+			for (const term of terms) sum += Number(term)
+			return sum
+		}
+	}
+
+	const match = numberPattern.exec(text)
 	if (!match) return null
 
 	const unit = match[2].toLowerCase() || "cm"
