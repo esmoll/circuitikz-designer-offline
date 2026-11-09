@@ -10,9 +10,8 @@
  * Three things are deliberately lossy, and each is either silent or reported
  * exactly once per file:
  *
- * - `text=<colour>` has no counterpart in `PositionedLabel` (the label uses the
- *   theme stroke, or `label.color` set by the user), so the colour is dropped
- *   with one warning;
+ * - `text=<colour>` maps through card `011`'s named-colour map onto
+ *   `label.color`; a colour the map does not know is dropped with one warning;
  * - a direction the designer has no anchor key for is dropped, leaving the
  *   label at its default anchor, with one warning;
  * - TeX sizing wrappers (`\footnotesize`, `\small`, ...) disappear: the
@@ -31,6 +30,7 @@
 import type { NodeSaveObject } from "../../components/nodeComponent"
 import type { PositionedLabel } from "../../mixins/labelable"
 import { resolveAbsolute, toDesignerPoint } from "../coords/absolute"
+import { resolveAnchor } from "../coords/anchors"
 import { resolveCalcOffset } from "../coords/calcOffset"
 import { resolveCalcPartway } from "../coords/calcPartway"
 import { resolveNamed } from "../coords/named"
@@ -47,7 +47,10 @@ import type {
 	RawCommand,
 } from "../types"
 
-/** Warning reason for a `text=<colour>` option the label cannot carry. */
+/**
+ * Warning reason for a `text=<colour>` naming a colour card `011` never
+ * collected, so the label cannot know it.
+ */
 const colourReason = "label colour of text node (text=) not imported"
 
 /** Warning reason for an anchor name the designer has no key for. */
@@ -60,7 +63,8 @@ const positionReason = "position of text node not resolvable"
  * Coordinate resolvers, tried in order until one accepts the token.
  *
  * The same chain cards `041`, `042` and `043` use; `resolveCalcPartway` covers
- * the `$(A)!0.5!(B)$` spelling (card `035`).
+ * the `$(A)!0.5!(B)$` spelling (card `035`), and `resolveAnchor` (card `033`)
+ * covers the bare sub-node anchor `(VS.G)` that the corpus places text at.
  *
  * @readonly
  */
@@ -68,6 +72,7 @@ const coordChain: CoordResolver[] = [
 	resolveAbsolute,
 	resolveRelative,
 	resolveNamed,
+	resolveAnchor,
 	resolveCalcOffset,
 	resolveCalcPartway,
 ]
@@ -403,11 +408,14 @@ function pushWarning(ctx: BuildContext, warning: ImportWarning): void {
  * @param value - the label text, TeX sizing wrappers already removed
  * @param anchor - the designer anchor key, or `null` for the default anchor
  * @param point - the `at` position in cm, TikZ orientation
+ * @param colour - the resolved label colour (hex from card `011`'s map), or
+ * `null` to keep the theme stroke
  * @returns the node save object, ready for `SaveController.loadFromJSON`
  */
-function emitTextNode(value: string, anchor: string | null, point: Point): ComponentSaveObject {
+function emitTextNode(value: string, anchor: string | null, point: Point, colour: string | null): ComponentSaveObject {
 	const label: PositionedLabel = { value }
 	if (anchor !== null) label.anchor = anchor
+	if (colour !== null) label.color = colour
 
 	const component = {
 		type: "node",
@@ -445,12 +453,18 @@ function standaloneTextNode(cmd: RawCommand, ctx: BuildContext): ComponentSaveOb
 	}
 	ctx.coords.lastPoint = resolved.lastPoint
 
-	// `text=<colour>` cannot be represented; the text itself is still imported.
-	if (optionValue(cmd.options, "text") !== null) {
-		warnOnce(ctx, { line: cmd.line, text: cmd.source, reason: colourReason })
+	// `text=<colour>` maps through card `011`'s named-colour map; a colour the
+	// map does not know stays a warning, and the text is imported either way.
+	let colour: string | null = null
+	const colourName = optionValue(cmd.options, "text")
+	if (colourName !== null) {
+		colour = ctx.colors[colourName] ?? null
+		if (colour === null) {
+			warnOnce(ctx, { line: cmd.line, text: cmd.source, reason: colourReason })
+		}
 	}
 
-	return [emitTextNode(value, anchorOf(cmd.options, cmd, ctx), resolved.point)]
+	return [emitTextNode(value, anchorOf(cmd.options, cmd, ctx), resolved.point, colour)]
 }
 
 /**
