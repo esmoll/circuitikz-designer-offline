@@ -1,0 +1,295 @@
+{
+  "generatedBy": "npm run test:import -- --record",
+  "files": {
+    "acreg.tex": {
+      "components": 13,
+      "skipped": 0,
+      "settings": {
+        "european": true,
+        "bipolesLength": 1
+      },
+      "colors": {
+        "ink": "#1f2a33",
+        "grp": "#2e6e8c"
+      }
+    },
+    "boost.tex": {
+      "components": 27,
+      "skipped": 0,
+      "settings": {
+        "european": true,
+        "bipolesLength": 1
+      },
+      "colors": {
+        "ink": "#1f2a33",
+        "grp": "#2e6e8c"
+      }
+    },
+    "bridge_circuitikz.tex": {
+      "components": 58,
+      "skipped": 1,
+      "settings": {
+        "european": true,
+        "bipolesLength": 1
+      },
+      "colors": {
+        "ink": "#1f2a33",
+        "grp": "#2e6e8c"
+      }
+    },
+    "bridge1ph.tex": {
+      "components": 42,
+      "skipped": 0,
+      "settings": {
+        "european": true,
+        "bipolesLength": 1
+      },
+      "colors": {
+        "ink": "#1f2a33",
+        "grp": "#2e6e8c"
+      }
+    },
+    "bridge3ph.tex": {
+      "components": 59,
+      "skipped": 1,
+      "settings": {
+        "european": true,
+        "bipolesLength": 1
+      },
+      "colors": {
+        "ink": "#1f2a33",
+        "grp": "#2e6e8c"
+      }
+    },
+    "buck.tex": {
+      "components": 28,
+      "skipped": 0,
+      "settings": {
+        "european": true,
+        "bipolesLength": 1
+      },
+      "colors": {
+        "ink": "#1f2a33",
+        "grp": "#2e6e8c"
+      }
+    },
+    "buckboost.tex": {
+      "components": 28,
+      "skipped": 0,
+      "settings": {
+        "european": true,
+        "bipolesLength": 1
+      },
+      "colors": {
+        "ink": "#1f2a33",
+        "grp": "#2e6e8c"
+      }
+    },
+    "cell.tex": {
+      "components": 0,
+      "skipped": 1,
+      "unsupported": true,
+      "settings": {
+        "european": false,
+        "bipolesLength": 1
+      },
+      "colors": {
+        "ink": "#1f2a33",
+        "grp": "#2e6e8c",
+        "light": "#e9f7f5"
+      }
+    },
+    "comm1ph.tex": {
+      "components": 36,
+      "skipped": 0,
+      "settings": {
+        "european": true,
+        "bipolesLength": 1
+      },
+      "colors": {
+        "ink": "#1f2a33",
+        "grp": "#2e6e8c"
+      }
+    },
+    "csi3ph.tex": {
+      "components": 83,
+      "skipped": 1,
+      "settings": {
+        "european": true,
+        "bipolesLength": 1
+      },
+      "colors": {
+        "ink": "#1f2a33",
+        "grp": "#2e6e8c"
+      }
+    },
+    "filter_lc.tex": {
+      "components": 12,
+      "skipped": 0,
+      "settings": {
+        "european": true,
+        "bipolesLength": 1
+      },
+      "colors": {
+        "ink": "#1f2a33",
+        "grp": "#2e6e8c"
+      }
+    },
+    "filters6.tex": {
+      "components": 56,
+      "skipped": 5,
+      "settings": {
+        "european": true,
+        "bipolesLength": 0.85
+      },
+      "colors": {
+        "ink": "#1f2a33",
+        "grp": "#2e6e8c"
+      }
+    },
+    "flyback.tex": {
+      "components": 33,
+      "skipped": 0,
+      "settings": {
+        "european": true,
+        "bipolesLength": 1
+      },
+      "colors": {
+        "ink": "#1f2a33",
+        "grp": "#2e6e8c"
+      }
+    },
+    "forward.tex": {
+      "components": 54,
+      "skipped": 0,
+      "settings": {
+        "european": true,
+        "bipolesLength": 1
+      },
+      "colors": {
+        "ink": "#1f2a33",
+        "grp": "#2e6e8c"
+      }
+    },
+    "halfbridge.tex": {
+      "components": 31,
+      "skipped": 0,
+      "settings": {
+        "european": true,
+        "bipolesLength": 1
+      },
+      "colors": {
+        "ink": "#1f2a33",
+        "grp": "#2e6e8c"
+      }
+    },
+    "inv1ph.tex": {
+      "components": 37,
+      "skipped": 0,
+      "settings": {
+        "european": true,
+        "bipolesLength": 1
+      },
+      "colors": {
+        "ink": "#1f2a33",
+        "grp": "#2e6e8c"
+      }
+    },
+    "pushpull.tex": {
+      "components": 51,
+      "skipped": 0,
+      "settings": {
+        "european": true,
+        "bipolesLength": 1
+      },
+      "colors": {
+        "ink": "#1f2a33",
+        "grp": "#2e6e8c"
+      }
+    },
+    "sepic.tex": {
+      "components": 35,
+      "skipped": 0,
+      "settings": {
+        "european": true,
+        "bipolesLength": 1
+      },
+      "colors": {
+        "ink": "#1f2a33",
+        "grp": "#2e6e8c"
+      }
+    },
+    "thyristor.tex": {
+      "components": 3,
+      "skipped": 0,
+      "settings": {
+        "european": true,
+        "bipolesLength": 1.4
+      },
+      "colors": {
+        "ink": "#1f2a33",
+        "grp": "#2e6e8c"
+      }
+    },
+    "vsi1ph.tex": {
+      "components": 71,
+      "skipped": 1,
+      "settings": {
+        "european": true,
+        "bipolesLength": 1
+      },
+      "colors": {
+        "ink": "#1f2a33",
+        "grp": "#2e6e8c"
+      }
+    },
+    "vsi3ph.tex": {
+      "components": 100,
+      "skipped": 1,
+      "settings": {
+        "european": true,
+        "bipolesLength": 1
+      },
+      "colors": {
+        "ink": "#1f2a33",
+        "grp": "#2e6e8c"
+      }
+    },
+    "zero_circuitikz.tex": {
+      "components": 32,
+      "skipped": 1,
+      "settings": {
+        "european": true,
+        "bipolesLength": 1
+      },
+      "colors": {
+        "ink": "#1f2a33",
+        "grp": "#2e6e8c"
+      }
+    },
+    "zero1ph.tex": {
+      "components": 33,
+      "skipped": 0,
+      "settings": {
+        "european": true,
+        "bipolesLength": 1
+      },
+      "colors": {
+        "ink": "#1f2a33",
+        "grp": "#2e6e8c"
+      }
+    },
+    "zeta.tex": {
+      "components": 33,
+      "skipped": 0,
+      "settings": {
+        "european": true,
+        "bipolesLength": 1
+      },
+      "colors": {
+        "ink": "#1f2a33",
+        "grp": "#2e6e8c"
+      }
+    }
+  }
+}
