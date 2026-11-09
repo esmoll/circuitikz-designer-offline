@@ -50,7 +50,7 @@ export async function run(ctx) {
 	}
 
 	// buck.tex — card acceptance plus the current exact reality, so regressions scream.
-	// The 2 warnings are the documented deviation from the aspirational "skipped === 0";
+	// The 1 remaining warning is the documented deviation (the (name.anchor) chain gap tracked on cards 041/051; the bipoles/thickness and text= holes were closed by the 013/044 review rounds) from the aspirational "skipped === 0";
 	// one per line below, each naming its owning card.
 	{
 		const { saveFile, result } = texToSaveFile(readFixture("buck.tex"), "buck.tex")
@@ -58,16 +58,12 @@ export async function run(ctx) {
 		ctx.assert(saveFile.components.length === 27, `buck.tex must produce 27 components (card acceptance: more than 0), got ${saveFile.components.length}`)
 		const counts = census(saveFile.components)
 		ctx.assert(counts.wire === 7 && counts.path === 5 && counts.node === 15, `buck census must be {wire: 7, path: 5, node: 15}, got ${JSON.stringify(counts)}`)
-		ctx.assert(result.skipped.length === 2, `buck.tex must report exactly 2 warnings, got ${result.skipped.length}`)
-		const [anchor, colour] = result.skipped
+		ctx.assert(result.skipped.length === 1, `buck.tex must report exactly 1 warning, got ${result.skipped.length}`)
+		const [anchor] = result.skipped
 		// (b) card 051 — the resolveAnchor chain gap: (VT.G) cannot be resolved, wire skipped
 		ctx.assert(anchor.line === 30, `buck warning (b) must sit on line 30, got ${anchor.line}`)
 		ctx.assert(anchor.text === "(VT.G)", `buck warning (b) must name the unresolvable (VT.G) coordinate, got ${JSON.stringify(anchor.text)}`)
 		ctx.assert(anchor.reason === "coordinate could not be resolved; wire skipped", `buck warning (b) must be card 051's wire-skipped warning, got ${JSON.stringify(anchor.reason)}`)
-		// (c) card 044 — the label colour (text=) of a text node is not imported yet
-		ctx.assert(colour.line === 31, `buck warning (c) must sit on line 31, got ${colour.line}`)
-		ctx.assert(colour.text.includes("ШИМ"), `buck warning (c) must be the ШИМ label node, got ${JSON.stringify(colour.text)}`)
-		ctx.assert(colour.reason.startsWith("label colour of text node"), `buck warning (c) must be card 044's label-colour warning, got ${JSON.stringify(colour.reason)}`)
 	}
 
 	// saveFile.components is the SAME array reference as result.components — no copy

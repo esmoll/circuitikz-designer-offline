@@ -283,4 +283,44 @@ export async function run(ctx) {
 		ctx.assert(!textNodeHandler.canHandle(cmd("above", " at (0,0) {$a$}", 1, "unknown")), "kind unknown is out of scope")
 		ctx.assert(textNodeHandler.handle(cmd("above", " at (0,0) {$a$}", 1, "draw"), build).length === 0, "a draw must emit nothing here")
 	}
+
+	// --- review round: bare sub-node anchors and text= colours ---
+	{
+		// (VS.G) reaches resolveAnchor once it sits in the chain; the named map
+		// holds the component point, the anchor resolver knows the symbol pin.
+		const bc = makeCtx()
+		bc.coords.named.set("VS", { x: 1, y: 0 })
+		bc.coords.anchors = { resolve: (node, anchor) => (node === "VS" && anchor === "G" ? { x: 1.2, y: 0.3 } : null) }
+		const out = textNodeHandler.handle(cmd("anchor=west", "at (VS.G) {УЭ}"), bc)
+		ctx.assert(out.length === 1, `(VS.G): expected 1 text node, got ${out.length}`)
+		ctx.approx(out[0].position.x, 1.2 * PX_PER_CM, 1e-6)
+		ctx.approx(out[0].position.y, -0.3 * PX_PER_CM, 1e-6)
+		ctx.assert(bc.report.length === 0, `(VS.G): no warning expected, got ${JSON.stringify(bc.report)}`)
+	}
+	{
+		// a dotted anchor with no resolver degrades to the component centre
+		const bc = makeCtx()
+		bc.coords.named.set("VS", { x: 1, y: 0 })
+		const out = textNodeHandler.handle(cmd("anchor=west", "at (VS.G) {УЭ}"), bc)
+		ctx.assert(out.length === 1, `(VS.G) without anchors: expected 1 text node, got ${out.length}`)
+		ctx.approx(out[0].position.x, PX_PER_CM, 1e-6)
+		ctx.approx(out[0].position.y, 0, 1e-6)
+	}
+	{
+		// text=grp with a known named colour maps onto label.color, no warning
+		const bc = makeCtx()
+		bc.colors = { grp: "#2e6e8c", ink: "#1f2a33" }
+		const out = textNodeHandler.handle(cmd("anchor=west, text=grp", "at (1,1) {$x$}"), bc)
+		ctx.assert(out.length === 1, `known text colour: expected 1 node, got ${out.length}`)
+		ctx.assert(out[0].label.color === "#2e6e8c", `known text colour must set label.color, got ${JSON.stringify(out[0].label)}`)
+		ctx.assert(bc.report.length === 0, `known text colour: no warning expected, got ${JSON.stringify(bc.report)}`)
+	}
+	{
+		// an unknown colour name keeps the once-per-file warning
+		const bc = makeCtx()
+		const out = textNodeHandler.handle(cmd("anchor=west, text=grp", "at (1,1) {$x$}"), bc)
+		ctx.assert(out.length === 1, `unknown text colour: expected 1 node, got ${out.length}`)
+		ctx.assert(out[0].label.color === undefined, `unknown text colour must not set label.color, got ${JSON.stringify(out[0].label)}`)
+		ctx.assert(bc.report.length === 1 && bc.report[0].reason.startsWith("label colour"), `unknown text colour: expected the colour warning, got ${JSON.stringify(bc.report)}`)
+	}
 }
