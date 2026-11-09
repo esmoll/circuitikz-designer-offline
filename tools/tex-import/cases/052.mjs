@@ -55,15 +55,10 @@ export async function run(ctx) {
 	{
 		const { saveFile, result } = texToSaveFile(readFixture("buck.tex"), "buck.tex")
 		ctx.assert(saveFile.version === "0.1", `saveFile.version must be "0.1", got ${JSON.stringify(saveFile.version)}`)
-		ctx.assert(saveFile.components.length === 27, `buck.tex must produce 27 components (card acceptance: more than 0), got ${saveFile.components.length}`)
+		ctx.assert(saveFile.components.length === 28, `buck.tex must produce 28 components (card acceptance: more than 0), got ${saveFile.components.length}`)
 		const counts = census(saveFile.components)
-		ctx.assert(counts.wire === 7 && counts.path === 5 && counts.node === 15, `buck census must be {wire: 7, path: 5, node: 15}, got ${JSON.stringify(counts)}`)
-		ctx.assert(result.skipped.length === 1, `buck.tex must report exactly 1 warning, got ${result.skipped.length}`)
-		const [anchor] = result.skipped
-		// (b) card 051 — the resolveAnchor chain gap: (VT.G) cannot be resolved, wire skipped
-		ctx.assert(anchor.line === 30, `buck warning (b) must sit on line 30, got ${anchor.line}`)
-		ctx.assert(anchor.text === "(VT.G)", `buck warning (b) must name the unresolvable (VT.G) coordinate, got ${JSON.stringify(anchor.text)}`)
-		ctx.assert(anchor.reason === "coordinate could not be resolved; wire skipped", `buck warning (b) must be card 051's wire-skipped warning, got ${JSON.stringify(anchor.reason)}`)
+		ctx.assert(counts.wire === 8 && counts.path === 5 && counts.node === 15, `buck census must be {wire: 8, path: 5, node: 15}, got ${JSON.stringify(counts)}`)
+		ctx.assert(result.skipped.length === 0, `buck.tex must report no warnings at all, got ${result.skipped.length}`)
 	}
 
 	// saveFile.components is the SAME array reference as result.components — no copy
