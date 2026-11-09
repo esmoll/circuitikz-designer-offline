@@ -46,6 +46,36 @@ function pushWarning(report: ImportWarning[], warning: ImportWarning): void {
 const asksForBipoles = (cmd: RawCommand): boolean => splitPath(cmd.arguments).some((el) => el.kind === "to")
 
 /**
+ * Matches `\fill (x,y) circle (r)` after the lexer: the arguments hold the
+ * coordinate and the radius, nothing else.
+ *
+ * @readonly
+ */
+const fillCirclePattern = /^\s*\(\s*([^()]*)\s*\)\s+circle\s+\(\s*([^()]*)\s*\)\s*$/
+
+/**
+ * Translates a filled-circle statement into a circ pole node.
+ *
+ * `\fill (x,y) circle (1.6pt)` marks a junction dot, and the designer models
+ * that as the `circ` node symbol (card `043`). The radius is dropped — the
+ * designer's pole symbol has a fixed size. Other `\fill` shapes keep the
+ * generic `unsupported command` warning.
+ *
+ * @param cmd - the statement being dispatched
+ * @returns a synthetic circ-node command, or `null` when this is not a
+ * fill-circle statement
+ */
+function fillAsPoleDot(cmd: RawCommand): RawCommand | null {
+	if (!cmd || cmd.kind !== "unknown") return null
+	if (!/^\\fill\b/.test(cmd.source ?? "")) return null
+
+	const match = fillCirclePattern.exec(cmd.arguments ?? "")
+	if (!match) return null
+
+	return { kind: "node", options: "circ", arguments: `at (${match[1].trim()}) {}`, line: cmd.line, source: cmd.source }
+}
+
+/**
  * Runs every handler over every statement and assembles the components.
  *
  * `ctx.coords` lives for the whole call — names registered by one `\draw`
@@ -76,8 +106,12 @@ export function buildComponents(commands: RawCommand[], doc: TextDoc): ImportRes
 
 	const components: ComponentSaveObject[] = []
 
-	for (const cmd of commands) {
+	for (const original of commands) {
 		try {
+			// `\fill (x,y) circle (r)` is a junction dot in disguise; hand it to
+			// the pole handler as the circ node it models.
+			const cmd = fillAsPoleDot(original) ?? original
+
 			if (cmd.kind === "unknown") {
 				pushWarning(ctx.report, { line: cmd.line, text: cmd.source, reason: "unsupported command" })
 				continue
