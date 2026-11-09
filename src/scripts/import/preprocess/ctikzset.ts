@@ -140,8 +140,11 @@ export const applySettings: PreprocessStage = (doc) => {
 			} else if (key === "inductor") {
 				if (value === "american" || value === "european") doc.settings.inductorStyle = value
 				else warn(line, `inductor=${value}`, "unknown inductor style")
-			} else if (key !== "diodes/fill" && key !== "diodes/empty") {
+			} else if (key !== "diodes/fill" && key !== "diodes/empty" && key !== "bipoles/thickness") {
 				// diodes/fill and diodes/empty are colour references — the mapping cards handle them.
+				// bipoles/thickness scales the bipole line width relatively; the frozen
+				// GlobalSettings has no field for it, so it is recognised and dropped,
+				// like the colour keys above (review round on card 013).
 				warn(line, key, "unknown ctikzset key")
 			}
 		}
